@@ -1,0 +1,711 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0f3d2e">
+  <title>أساسيات البرمجة — الجلسة الأولى | عبد الرحمن العظم</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <!-- <link rel="stylesheet" href="styles.css"> -->
+  <style>
+    :root {
+  --forest: #0f3d2e;
+  --forest-2: #145a3a;
+  --emerald: #1f7a5c;
+  --mint: #21c05b;
+  --mint-light: #dff8e8;
+  --ink: #172321;
+  --muted: #65746f;
+  --paper: #fbfdfb;
+  --line: rgba(15, 61, 46, .12);
+  --glass: rgba(255,255,255,.7);
+  --mono: "JetBrains Mono", Consolas, monospace;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; min-height: 100%; }
+body { font-family: "Cairo", Tahoma, Arial, sans-serif; color: var(--ink); background: #edf3ee; overflow: hidden; }
+a { color: inherit; text-decoration: none; }
+button, input { font: inherit; }
+button { cursor: pointer; }
+.ambient { position: fixed; pointer-events: none; border-radius: 50%; filter: blur(1px); opacity: .58; }
+.ambient-one { width: 34vw; height: 34vw; top: -20vw; right: -6vw; background: radial-gradient(circle, rgba(33,192,91,.17), transparent 69%); }
+.ambient-two { width: 32vw; height: 32vw; bottom: -20vw; left: -3vw; background: radial-gradient(circle, rgba(15,61,46,.12), transparent 69%); }
+.stage { width: 100vw; height: 100dvh; display: flex; align-items: center; justify-content: center; padding: 0; }
+.deck { position: relative; width: min(100vw, 177.7778dvh); height: min(100dvh, 56.25vw); aspect-ratio: 16 / 9; overflow: hidden; isolation: isolate; background: var(--paper); box-shadow: 0 30px 110px rgba(10,51,34,.16); }
+.deck::before { content: ""; position: absolute; inset: 0; pointer-events: none; background-image: radial-gradient(rgba(15,61,46,.035) .7px, transparent .7px); background-size: 10px 10px; mask-image: linear-gradient(130deg, #000, transparent 80%); z-index: -1; }
+.topline { position: absolute; top: 3.6%; right: 4.2%; left: 4.2%; z-index: 10; display: flex; gap: 12px; align-items: center; font-size: clamp(9px, .83vw, 13px); color: #5b6b64; }
+.brand-mark { display: inline-grid; place-items: center; width: 36px; height: 30px; border-radius: 10px; background: var(--forest); color: #9df0b5; direction: ltr; font-family: var(--mono); font-weight: 700; font-size: 12px; letter-spacing: -2px; box-shadow: 0 6px 16px rgba(15,61,46,.16); }
+.brand-name { font-weight: 800; color: var(--forest); white-space: nowrap; }
+.topline-sep { height: 18px; width: 1px; background: #ced8d0; margin: 0 3px; }
+.course-label { color: #7b8a83; font-weight: 600; }
+.progress-track { position: absolute; z-index: 20; top: 0; right: 0; width: 100%; height: 3px; background: rgba(15,61,46,.055); }
+.progress-fill { width: 5.555%; height: 100%; background: linear-gradient(90deg, var(--mint), var(--forest-2)); transition: width .35s ease; }
+.slide { position: absolute; inset: 0; padding: 9.2% 6.0% 8.8%; opacity: 0; visibility: hidden; transform: translateX(22px) scale(.992); transition: opacity .35s ease, transform .35s ease, visibility .35s; overflow: hidden; background: radial-gradient(ellipse at 100% 0%, rgba(33,192,91,.06), transparent 35%), linear-gradient(145deg, #fff 0%, #fbfdfb 65%, #f4faf5 100%); }
+.slide.active { opacity: 1; visibility: visible; transform: translateX(0) scale(1); z-index: 2; }
+.slide::after { content: ""; position: absolute; width: 28%; height: 1px; left: 6%; top: 14.5%; background: linear-gradient(90deg, transparent, rgba(31,122,92,.17)); pointer-events: none; }
+.section-kicker { color: var(--emerald); font-family: var(--mono); direction: ltr; text-align: right; text-transform: uppercase; font-size: clamp(9px,.78vw,12px); font-weight: 600; letter-spacing: .04em; margin-bottom: 1.1%; }
+h1, h2, h3, h4, p { margin-top: 0; }
+h2 { margin-bottom: 1.2%; color: var(--forest); font-size: clamp(25px, 3vw, 45px); line-height: 1.32; font-weight: 900; letter-spacing: -.035em; }
+.text-gradient { color: transparent; background: linear-gradient(110deg, #145a3a, #1f9b61 72%, #35c776); -webkit-background-clip: text; background-clip: text; }
+.section-subtitle { color: #738079; font-size: clamp(10px, 1.05vw, 15px); margin-bottom: 3.3%; line-height: 1.8; }
+.slide-index { position: absolute; bottom: 4%; left: 5%; direction: ltr; z-index: 10; color: var(--forest); font: 600 clamp(10px, .83vw, 13px) var(--mono); }
+.slide-index span { color: #a2b0a8; }
+.deck-controls { position: absolute; z-index: 50; bottom: 1.6%; left: 4%; right: 4%; display: flex; justify-content: space-between; align-items: center; padding: 7px 9px; border: 1px solid rgba(15,61,46,.10); border-radius: 16px; background: rgba(255,255,255,.77); backdrop-filter: blur(18px); box-shadow: 0 8px 24px rgba(15,61,46,.065); }
+.control-left, .control-right { display: flex; align-items: center; gap: 8px; }
+.control-btn { border: 1px solid #dfe9e1; border-radius: 9px; background: white; min-width: 31px; height: 31px; color: var(--forest); display: inline-flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; transition: background .2s, transform .2s, border-color .2s; }
+.control-btn:hover { background: #eaf8ef; border-color: #a5dcb7; transform: translateY(-1px); }
+.control-btn:disabled { opacity: .3; cursor: not-allowed; transform: none; }
+.text-control { gap: 8px; padding: 0 11px; font-size: 10px; font-weight: 700; white-space: nowrap; }
+.control-count { display: flex; align-items: center; gap: 7px; direction: ltr; font: 600 10px var(--mono); color: var(--forest); padding: 0 9px; }
+.control-count span { color: #a9b5ae; }
+.keyboard-help { color: #89968f; font-size: 9px; margin-left: 8px; white-space: nowrap; }
+.notes-panel { display: none; position: absolute; z-index: 45; bottom: 8.7%; left: 4.2%; right: 4.2%; padding: 13px 17px; border: 1px solid rgba(15,61,46,.12); border-radius: 14px; background: rgba(244,250,246,.97); box-shadow: 0 12px 40px rgba(15,61,46,.12); }
+.deck.notes-visible .notes-panel { display: block; animation: noteIn .2s ease; }
+.notes-label { display: inline-block; color: var(--emerald); font-weight: 800; font-size: 10px; margin-bottom: 4px; }
+.notes-panel p { margin: 0; color: #465750; font-size: clamp(10px,.95vw,13px); line-height: 1.75; }
+@keyframes noteIn { from {opacity:0;transform:translateY(7px)} to {opacity:1;transform:translateY(0)} }
+.toast { opacity: 0; pointer-events: none; position: fixed; left: 50%; bottom: 24px; transform: translate(-50%, 8px); z-index: 100; border-radius: 11px; padding: 10px 16px; color: white; background: var(--forest); font-size: 12px; box-shadow: 0 12px 30px rgba(15,61,46,.2); transition: all .2s; }
+.toast.show { opacity: 1; transform: translate(-50%, 0); }
+/* Hero */
+.hero-slide { display: grid; grid-template-columns: 1.02fr .98fr; gap: 2.5%; align-items: center; padding-top: 9%; }
+.hero-slide::before { content: ""; position: absolute; width: 56%; height: 110%; right: -10%; top: -35%; background: radial-gradient(ellipse, rgba(33,192,91,.14), transparent 68%); z-index: -1; }
+.hero-copy { position: relative; z-index: 3; padding-bottom: 4%; }
+.eyebrow { display: inline-flex; align-items: center; gap: 8px; color: var(--emerald); background: rgba(33,192,91,.085); border: 1px solid rgba(33,192,91,.14); border-radius: 100px; padding: 6px 13px; font-size: clamp(9px,.85vw,12px); font-weight: 800; margin-bottom: 4%; }
+.live-dot, .green-dot { width: 7px; height: 7px; border-radius: 50%; display: inline-block; background: var(--mint); box-shadow: 0 0 0 4px rgba(33,192,91,.11); }
+.hero-copy h1 { color: var(--forest); font-size: clamp(43px, 6vw, 84px); line-height: 1.03; letter-spacing: -.055em; font-weight: 900; margin-bottom: 4%; }
+.hero-lead { color: #566960; font-size: clamp(12px, 1.4vw, 19px); line-height: 1.9; max-width: 500px; margin-bottom: 5%; }
+.hero-meta { display: flex; flex-wrap: wrap; gap: 7px; margin-bottom: 7%; }
+.meta-pill { font-size: clamp(9px,.79vw,11px); border: 1px solid #dfe9e1; background: rgba(255,255,255,.8); color: #53675d; border-radius: 8px; padding: 6px 10px; font-weight: 700; }
+.hero-signature { display: flex; align-items: center; gap: 12px; }
+.signature-line { height: 38px; width: 3px; background: linear-gradient(var(--mint), var(--forest)); border-radius: 8px; }
+.hero-signature strong, .hero-signature small { display: block; }
+.hero-signature strong { font-size: clamp(10px,1vw,14px); color: var(--forest); }
+.hero-signature small { font-size: clamp(8px,.78vw,11px); color: #87958e; margin-top: 2px; }
+.hero-visual { position: relative; min-height: 72%; display: flex; align-items: center; justify-content: center; }
+.image-frame { position: relative; width: 84%; height: 78%; border-radius: 27px 27px 80px 27px; overflow: hidden; transform: rotate(-2deg); background: linear-gradient(145deg, #092d21, #1e5d41 55%, #98d0a6); box-shadow: 0 22px 55px rgba(10,64,39,.22); border: 5px solid rgba(255,255,255,.88); }
+.image-frame img { width: 100%; height: 100%; object-fit: cover; display: block; filter: saturate(.82); }
+.image-shade { position: absolute; inset: 0; background: linear-gradient(180deg, transparent 35%, rgba(6,35,24,.4)), linear-gradient(130deg, rgba(16,73,48,.09), rgba(33,192,91,.13)); pointer-events: none; }
+.image-fallback { display: none; position: absolute; inset: 0; color: #d9f7e3; place-content: center; text-align: center; gap: 14px; direction: ltr; }
+.fallback-code { font: 900 65px var(--mono); color: #69e598; }
+.image-fallback code { font: 600 15px var(--mono); }
+.image-fallback small { font: 500 9px var(--mono); letter-spacing: .16em; color: #98c8ab; }
+.orbit { position: absolute; width: 92%; height: 86%; border: 1px solid rgba(31,122,92,.16); border-radius: 50%; transform: rotate(-28deg); }
+.orbit-b { width: 103%; height: 65%; transform: rotate(36deg); border-color: rgba(33,192,91,.17); }
+.float-chip { position: absolute; z-index: 4; display: flex; align-items: center; gap: 9px; background: rgba(255,255,255,.94); border: 1px solid rgba(15,61,46,.09); border-radius: 13px; padding: 10px 14px; box-shadow: 0 11px 27px rgba(17,56,38,.13); color: var(--forest); font-size: clamp(10px,1vw,14px); font-weight: 800; }
+.float-chip img { width: 24px; height: 24px; }
+.chip-python { top: 17%; left: -1%; }
+.chip-brackets { bottom: 14%; right: -1%; }
+.chip-bracket { font: 900 21px var(--mono); color: var(--mint); direction: ltr; }
+.hero-stamp { position: absolute; left: 1%; bottom: 5%; border-radius: 50%; width: 75px; height: 75px; display: grid; place-content: center; text-align: center; color: white; background: var(--forest); border: 5px solid #f7fcf8; box-shadow: 0 7px 25px rgba(15,61,46,.2); transform: rotate(7deg); }
+.hero-stamp span { font: 700 24px var(--mono); color: #a6f4bd; line-height: 1; }
+.hero-stamp small { font: 700 7px var(--mono); letter-spacing: .16em; margin-top: 3px; }
+/* Profile */
+.profile-layout { display: grid; grid-template-columns: 1.32fr .8fr; gap: 2.5%; height: 72%; margin-top: 3.5%; }
+.glass-panel { background: rgba(255,255,255,.75); border: 1px solid rgba(15,61,46,.10); border-radius: 23px; box-shadow: 0 14px 36px rgba(15,61,46,.055); }
+.profile-main { position: relative; padding: 5.5% 5%; display: grid; grid-template-columns: 92px 1fr; grid-template-rows: auto 1fr; gap: 0 22px; align-content: start; }
+.profile-monogram { width: 88px; height: 88px; display: grid; place-items: center; border-radius: 24px 24px 24px 7px; background: linear-gradient(140deg, #0f3d2e, #238658); color: white; font-size: 51px; font-weight: 900; box-shadow: 0 12px 25px rgba(15,61,46,.19); }
+.profile-monogram span { color: #83ef9e; }
+.profile-main h3 { font-size: clamp(20px, 2vw, 29px); color: var(--forest); margin: 0 0 5px; font-weight: 900; }
+.profile-title { color: var(--emerald); font-size: clamp(10px,1.02vw,14px); font-weight: 800; margin-bottom: 13px; }
+.profile-bio { font-size: clamp(10px,1.02vw,14px); line-height: 1.95; color: #66766e; margin-bottom: 10px; }
+.profile-tags { grid-column: 1 / -1; display: flex; align-content: start; align-items: center; gap: 8px; flex-wrap: wrap; padding-top: 22px; }
+.profile-tags span { font-size: clamp(8px,.78vw,11px); color: var(--forest); border: 1px solid #dcebe0; border-radius: 7px; padding: 7px 11px; background: #f6fcf7; font-weight: 700; }
+.profile-side { display: flex; flex-direction: column; gap: 11px; }
+.mini-stat { display: flex; align-items: center; gap: 13px; background: white; border: 1px solid var(--line); border-radius: 15px; padding: 12px 14px; min-height: 66px; }
+.stat-icon { width: 35px; height: 35px; display: grid; place-items: center; background: #e6f8ec; border-radius: 11px; color: var(--emerald); font: 800 13px var(--mono); }
+.mini-stat strong, .mini-stat small { display: block; }
+.mini-stat strong { color: var(--forest); font-size: clamp(10px,.95vw,13px); }
+.mini-stat small { color: #829088; font-size: clamp(8px,.75vw,10px); margin-top: 3px; }
+.profile-note { flex: 1; display: flex; align-items: center; padding: 14px 18px; border-radius: 15px; background: linear-gradient(130deg, #0f3d2e, #195a3d); color: #e6f7eb; font-weight: 700; font-size: clamp(10px,1vw,13px); line-height: 1.9; border-bottom: 3px solid var(--mint); }
+/* agenda */
+.agenda-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 11px 14px; margin-top: 2%; }
+.agenda-item { min-height: 69px; padding: 11px 13px; display: flex; align-items: center; gap: 12px; border: 1px solid #e3ece5; border-radius: 13px; background: rgba(255,255,255,.78); }
+.agenda-number { display: grid; place-items: center; flex: 0 0 34px; width: 34px; height: 34px; border-radius: 10px; color: var(--emerald); background: #ebf8ef; font: 700 10px var(--mono); }
+.agenda-item div { flex: 1; }
+.agenda-item strong, .agenda-item small { display: block; }
+.agenda-item strong { color: var(--forest); font-size: clamp(10px,1.05vw,14px); }
+.agenda-item small { color: #87938c; font-size: clamp(8px,.78vw,10px); margin-top: 2px; }
+.agenda-item b { color: var(--emerald); white-space: nowrap; font: 700 clamp(9px,.85vw,12px) var(--mono); }
+.agenda-highlight { background: linear-gradient(110deg, #edf9f0, #fff); border-color: #b8e4c5; box-shadow: inset 0 0 0 1px rgba(33,192,91,.055); }
+.agenda-highlight .agenda-number { background: var(--forest); color: white; }
+.agenda-footer { display: flex; align-items: center; gap: 10px; padding-top: 21px; color: #74847a; font-size: clamp(10px,.9vw,13px); }
+/* definition */
+.definition-banner { display: flex; align-items: center; gap: 13px; padding: 18px 23px; border-radius: 17px; background: linear-gradient(110deg, #0f3d2e, #1b6947); color: white; margin: 3% 0 4%; position: relative; overflow: hidden; }
+.definition-banner::after { content:""; position:absolute; left:-5%; top:-85%; width:50%; height:250%; border-radius:50%; border:1px solid rgba(255,255,255,.16); box-shadow:0 0 0 14px rgba(255,255,255,.025),0 0 0 28px rgba(255,255,255,.025); }
+.quote-mark { font: 900 63px Georgia,serif; color: #6ce391; line-height: .7; }
+.definition-banner p { margin: 0; font-size: clamp(13px,1.45vw,20px); line-height: 1.7; font-weight: 700; }
+.io-flow { display: grid; grid-template-columns: 1fr 40px 1fr 40px 1fr; align-items: center; gap: 8px; }
+.io-card { text-align: center; border: 1px solid #e3ece5; background: white; border-radius: 17px; padding: 14px 10px 16px; box-shadow: 0 9px 24px rgba(15,61,46,.045); }
+.io-icon { margin: 0 auto 6px; width: 39px; height: 39px; border-radius: 13px; display: grid; place-items: center; background: #e4f8eb; color: var(--emerald); font-size: 20px; font-weight: 800; }
+.flow-label { display: block; color: #8aa093; font: 700 9px var(--mono); letter-spacing: .1em; direction: ltr; }
+.io-card h3 { margin: 6px 0 3px; color: var(--forest); font-size: clamp(12px,1.15vw,16px); }
+.io-card p { color: #849187; font-size: clamp(9px,.82vw,11px); margin: 0; }
+.io-process { border-color: #b8e5c7; background: #f7fcf8; }
+.flow-arrow { text-align: center; color: #3b9e64; font-size: 23px; }
+.definition-bottom { display: flex; align-items: center; justify-content: center; gap: 27px; margin-top: 4%; padding: 13px; border-top: 1px solid #e8efe9; }
+.definition-bottom div:not(.definition-divider) { display: flex; flex-direction: column; gap: 3px; }
+.little-label { color: var(--emerald); font-size: 9px; font-weight: 800; }
+.definition-bottom strong { font-size: clamp(10px,1vw,14px); color: var(--forest); }
+.definition-divider { width: 1px; height: 34px; background: #dfe8e0; }
+/* why */
+.why-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 13px; margin-top: 4%; }
+.why-card { position: relative; min-height: 208px; border: 1px solid #e4ece5; border-radius: 17px; padding: 20px 17px; background: rgba(255,255,255,.82); overflow: hidden; box-shadow: 0 10px 25px rgba(15,61,46,.035); }
+.why-icon { width: 43px; height: 43px; display: grid; place-items: center; border-radius: 13px; font-size: 21px; margin-bottom: 15px; font-weight: 800; }
+.icon-green { background: #def8e7; color: #158447; }.icon-blue { background: #e2f2fc; color: #1676aa; }.icon-gold { background: #fff4d9; color: #a47a1c; }.icon-purple { background: #f1e8ff; color: #8050b9; }
+.why-card h3 { color: var(--forest); font-size: clamp(13px,1.24vw,17px); margin-bottom: 8px; }
+.why-card p { color: #74827a; font-size: clamp(10px,.9vw,12px); line-height: 1.85; margin: 0; }
+.card-index { position: absolute; bottom: 9px; left: 14px; font: 700 22px var(--mono); color: rgba(15,61,46,.09); }
+.bottom-callout { display: flex; align-items: center; gap: 13px; background: #eff9f2; border: 1px solid #d4eddc; border-radius: 12px; padding: 13px 17px; margin-top: 17px; }
+.bottom-callout span { flex: 0 0 auto; padding: 5px 9px; background: var(--forest); color: #c8f3d3; border-radius: 7px; font-size: 10px; font-weight: 800; }
+.bottom-callout p { margin: 0; color: #3a5a49; font-size: clamp(10px,.95vw,13px); font-weight: 700; }
+/* specialties */
+.specialty-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 11px; margin-top: 3%; }
+.specialty-card { min-height: 105px; padding: 13px 14px; display: flex; align-items: flex-start; gap: 11px; position: relative; border: 1px solid #e4ece5; border-radius: 13px; background: rgba(255,255,255,.82); }
+.specialty-icon { flex: 0 0 36px; width: 36px; height: 36px; display: grid; place-items: center; border-radius: 11px; background: #f0f5f1; color: var(--emerald); font: 800 16px var(--mono); }
+.specialty-card h3 { color: var(--forest); font-size: clamp(11px,1.04vw,14px); margin: 1px 0 4px; }
+.specialty-card p { margin: 0 0 5px; color: #7b8981; font-size: clamp(8px,.78vw,10px); line-height: 1.65; }
+.specialty-card small { color: #278457; font: 600 clamp(7px,.68vw,9px) var(--mono); direction: ltr; display: inline-block; }
+.featured-specialty { background: linear-gradient(130deg, #0f3d2e, #1d6946); border-color: #1b704b; box-shadow: 0 9px 23px rgba(15,61,46,.13); }
+.featured-specialty .specialty-icon { background: rgba(255,255,255,.12); color: #9bf0b4; }
+.featured-specialty h3 { color: white; }.featured-specialty p { color: #c9dfd0; }.featured-specialty small { color: #9bf0b4; }
+.featured-label { position: absolute; left: 9px; bottom: 8px; color: #a6f2ba; font-size: 7px; font-weight: 800; background: rgba(255,255,255,.1); border-radius: 5px; padding: 3px 5px; }
+/* path */
+.path-layout { display: grid; grid-template-columns: .95fr 1.05fr; gap: 5%; margin-top: 3%; height: 76%; }
+.path-left { display: flex; flex-direction: column; justify-content: center; }
+.path-step { display: flex; align-items: center; gap: 14px; border: 1px solid #e1ebe3; border-radius: 15px; background: rgba(255,255,255,.86); padding: 11px 14px; box-shadow: 0 7px 20px rgba(15,61,46,.035); }
+.step-badge { display: grid; place-items: center; width: 31px; height: 31px; border-radius: 9px; color: white; background: var(--forest); font: 700 10px var(--mono); }
+.path-step div { flex: 1; }
+.path-step h3 { margin: 0 0 2px; color: var(--forest); font: 800 17px var(--mono); direction: ltr; text-align: right; }
+.path-step p { margin: 0; font-size: clamp(9px,.84vw,11px); color: #87958c; }
+.path-step img { width: 30px; height: 30px; }
+.path-connector { width: 2px; height: 16px; margin-right: 29px; background: linear-gradient(var(--mint), #a8dbb5); }
+.path-right { position: relative; display: flex; flex-direction: column; justify-content: center; align-items: flex-start; padding: 7% 8%; border-radius: 22px; background: linear-gradient(140deg, #f0fbf3, #fff); border: 1px solid #dcefe1; overflow: hidden; }
+.path-right::after { content: ""; position: absolute; width: 210px; height: 210px; border-radius: 50%; background: radial-gradient(circle, rgba(33,192,91,.13), transparent 70%); top: -90px; left: -70px; }
+.logic-orb { position: relative; width: 105px; height: 105px; border-radius: 50%; display: grid; place-items: center; background: radial-gradient(circle at 34% 28%, #2fae70, #0f3d2e 70%); box-shadow: 0 12px 34px rgba(15,61,46,.22), inset 0 0 0 7px rgba(255,255,255,.08); margin-bottom: 6%; }
+.orb-code { color: #d9fbe2; font: 900 32px var(--mono); direction: ltr; }
+.orb-dot { position: absolute; width: 9px; height: 9px; background: #8fe6a8; border: 3px solid #f0fbf3; border-radius: 50%; }
+.dot-one { top: 7px; right: 18px; }.dot-two { bottom: 13px; left: 3px; }.dot-three { top: 53%; right: -4px; }
+.path-right h3 { color: var(--forest); font-size: clamp(16px,1.8vw,24px); margin: 0 0 8px; }
+.path-right p { position: relative; z-index: 1; color: #6c7d73; font-size: clamp(10px,1vw,13px); line-height: 1.95; margin: 0 0 6%; max-width: 400px; }
+.python-tag { display: flex; align-items: center; gap: 9px; background: white; border: 1px solid #d9e9de; border-radius: 9px; padding: 8px 12px; color: var(--forest); font-size: clamp(9px,.87vw,12px); font-weight: 800; }
+.python-tag img { width: 23px; height: 23px; }
+/* salary */
+.salary-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 3%; margin-top: 3%; }
+.salary-number-card { color: white; border-radius: 21px; padding: 6% 7%; background: linear-gradient(140deg, #0f3d2e, #1b6645); position: relative; overflow: hidden; box-shadow: 0 15px 33px rgba(15,61,46,.16); }
+.salary-number-card::after { content: "$"; position: absolute; font: 900 230px Georgia,serif; color: rgba(255,255,255,.045); left: -14px; bottom: -95px; }
+.salary-label { display: inline-block; color: #b9e8c6; font-size: clamp(9px,.87vw,12px); border: 1px solid rgba(185,232,198,.22); background: rgba(255,255,255,.05); border-radius: 6px; padding: 6px 9px; }
+.salary-number { direction: ltr; text-align: right; font: 700 clamp(32px,4.5vw,62px) var(--mono); letter-spacing: -.08em; color: #fff; margin: 10% 0 3%; }
+.salary-number-card p { color: #d0e9d8; font-size: clamp(10px,1.05vw,14px); margin: 0; }
+.salary-bar { height: 5px; background: rgba(255,255,255,.14); border-radius: 8px; margin-top: 10%; overflow: hidden; }
+.salary-bar span { display: block; height: 100%; width: 76%; border-radius: inherit; background: linear-gradient(90deg, #3fd978, #b6f5c5); }
+.salary-source { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: 9%; position: relative; z-index: 1; }
+.salary-source span { color: #b8d7c2; font-size: clamp(7px,.72vw,9px); }
+.salary-source a { font-size: clamp(8px,.78vw,10px); font-weight: 800; color: #b6f5c5; border-bottom: 1px solid rgba(182,245,197,.5); }
+.salary-facts { display: flex; flex-direction: column; gap: 11px; }
+.salary-fact { display: flex; gap: 13px; align-items: flex-start; border: 1px solid #e3ece5; border-radius: 14px; padding: 13px; background: white; }
+.fact-icon { width: 33px; height: 33px; display: grid; place-items: center; flex: 0 0 33px; color: var(--emerald); background: #eaf8ee; border-radius: 10px; font-size: 17px; }
+.salary-fact strong { color: var(--forest); font-size: clamp(10px,1vw,13px); }
+.salary-fact p { color: #7d8982; font-size: clamp(8px,.8vw,10px); line-height: 1.8; margin: 3px 0 0; }
+.salary-disclaimer { font-size: clamp(8px,.77vw,10px); color: #849187; margin-top: 2%; border-right: 2px solid #9fdfb1; padding-right: 10px; }
+/* contests */
+.contest-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 15px; margin-top: 4%; }
+.contest-card { display: block; border: 1px solid #e1ebe3; border-radius: 18px; padding: 20px; background: white; box-shadow: 0 10px 25px rgba(15,61,46,.045); transition: transform .2s, box-shadow .2s; }
+.contest-card:hover { transform: translateY(-4px); box-shadow: 0 15px 35px rgba(15,61,46,.10); }
+.contest-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+.contest-top img { width: 38px; height: 38px; }
+.external { color: #a3afa7; font-size: 19px; }
+.atcoder-mark { width: 38px; height: 38px; display: grid; place-items: center; border-radius: 11px; color: white; background: #111827; font: 900 23px var(--mono); }
+.contest-card h3 { font-size: clamp(15px,1.5vw,20px); color: var(--forest); margin: 0 0 8px; direction: ltr; text-align: right; }
+.contest-card p { min-height: 47px; margin: 0 0 20px; color: #7c8981; font-size: clamp(10px,.9vw,12px); line-height: 1.8; }
+.contest-action { display: flex; align-items: center; justify-content: space-between; border-top: 1px solid #edf1ee; padding-top: 12px; font-size: 10px; font-weight: 800; color: var(--emerald); }
+.contest-action b { font-family: var(--mono); }
+.contest-tip { display: flex; align-items: center; gap: 13px; margin-top: 18px; background: #f0faf3; border: 1px solid #d8efdf; border-radius: 11px; padding: 13px 17px; }
+.contest-tip span { color: white; background: var(--emerald); border-radius: 6px; padding: 5px 8px; font-size: 9px; white-space: nowrap; }
+.contest-tip strong { color: #375b46; font-size: clamp(10px,.95vw,13px); }
+/* algorithm */
+.algorithm-layout { display: grid; grid-template-columns: .98fr 1.02fr; gap: 6%; margin-top: 2.2%; height: 76%; }
+.algorithm-visual { align-self: center; width: 80%; margin: auto; border: 1px solid #deebe1; border-radius: 19px; padding: 12px 30px 15px; display: flex; flex-direction: column; align-items: center; background: rgba(255,255,255,.86); box-shadow: 0 10px 28px rgba(15,61,46,.055); }
+.algorithm-number { align-self: flex-start; color: #8ea195; font: 600 8px var(--mono); direction: ltr; margin: 0 0 8px; }
+.algo-node { width: 77%; text-align: center; padding: 6px 10px; font-size: clamp(9px,.85vw,11px); font-weight: 700; border-radius: 8px; }
+.start-node, .end-node { width: 50%; background: #0f3d2e; color: #d9f6e2; border-radius: 50px; }
+.input-node { background: #e9f5ff; border: 1px solid #cce6fa; color: #306986; }
+.process-node { background: #eff9e9; border: 1px solid #d2e8c0; color: #436f2b; }
+.output-node { background: #fdf3dc; border: 1px solid #f2dfad; color: #8e6813; }
+.algo-line { width: 2px; height: 10px; background: #9bc6a7; }
+.algorithm-copy { position: relative; align-self: center; padding: 3% 0; }
+.big-quote { color: rgba(31,122,92,.11); font: 900 90px var(--mono); position: absolute; left: 4px; top: -20px; direction: ltr; }
+.algorithm-copy h3 { color: var(--forest); font-size: clamp(18px,2vw,28px); margin: 10px 0; position: relative; }
+.algorithm-copy > p { color: #74847a; font-size: clamp(11px,1.05vw,14px); line-height: 2; max-width: 390px; }
+.question-card { display: flex; gap: 12px; align-items: center; padding: 15px; border: 1px solid #deece1; border-radius: 13px; background: white; margin: 7% 0; }
+.question-dot { display: grid; place-items: center; flex: 0 0 33px; width: 33px; height: 33px; border-radius: 50%; color: white; background: var(--emerald); font: 800 18px var(--mono); }
+.question-card strong { color: var(--forest); font-size: 11px; }
+.question-card p { margin: 3px 0 0; color: #7f8c83; font-size: clamp(9px,.86vw,11px); line-height: 1.6; }
+.micro-note { font-size: clamp(8px,.78vw,10px) !important; color: #9aa69e !important; }
+/* tools */
+.tools-layout { display: grid; grid-template-columns: 1.03fr .97fr; gap: 5%; margin-top: 3%; align-items: center; }
+.tools-list { display: flex; flex-direction: column; gap: 8px; }
+.tool-row { display: flex; align-items: center; gap: 12px; border: 1px solid #e3ece5; border-radius: 11px; padding: 9px 11px; background: white; }
+.tool-symbol { display: grid; place-items: center; width: 35px; height: 35px; flex: 0 0 35px; border-radius: 10px; background: #eff8f1; color: var(--emerald); font-size: 17px; font-weight: 800; }
+.symbol-ide { background: #f0eaff; color: #8556b7; }.symbol-runtime { background: #e7f3ff; color: #3379b5; }.symbol-terminal { background: #eaf8eb; color: #1d7444; font: 800 11px var(--mono); direction: ltr; }.symbol-debug { background: #fff3de; color: #af842b; }
+.tool-row div { flex: 1; }
+.tool-row strong, .tool-row small { display: block; }
+.tool-row strong { color: var(--forest); font-size: clamp(10px,.98vw,13px); }
+.tool-row small { color: #88958d; font-size: clamp(8px,.72vw,10px); margin-top: 2px; }
+.tool-example { direction: ltr; color: #8b9a90; background: #f6f9f6; border: 1px solid #e8eee9; border-radius: 5px; padding: 4px 6px; font: 500 clamp(7px,.67vw,9px) var(--mono); white-space: nowrap; }
+.tool-visual { background: #111c19; border-radius: 17px; overflow: hidden; box-shadow: 0 17px 35px rgba(12,39,28,.19); direction: ltr; transform: perspective(900px) rotateY(-2deg); }
+.visual-header { display: flex; align-items: center; gap: 12px; background: #192823; padding: 12px 15px; color: #c5d5ca; font: 500 10px var(--mono); }
+.window-dots { display: inline-flex; gap: 5px; }
+.window-dots i { display: block; width: 7px; height: 7px; border-radius: 50%; background: #f47d73; }.window-dots i:nth-child(2) { background: #eec66a; }.window-dots i:nth-child(3) { background: #65d391; }
+.visual-lock { margin-left: auto; color: #72d995; font-size: 8px; }
+.editor-preview { padding: 10% 8%; display: grid; grid-template-columns: 24px 1fr; row-gap: 18px; color: #e4eee6; font: 500 clamp(8px,.85vw,11px) var(--mono); }
+.editor-preview .ln { color: #6d8175; text-align: right; padding-right: 11px; }
+.editor-preview code { white-space: nowrap; }
+.editor-preview em { font-style: normal; color: #96d8ff; }.editor-preview b { color: #8be3a5; font-weight: 500; }.editor-preview i { color: #f0d38c; font-style: normal; }.editor-preview .comment { color: #7f9987; }
+.visual-footer { background: #214b34; padding: 8px 13px; display: flex; align-items: center; gap: 8px; color: #c3e8cc; font: 500 8px var(--mono); }
+.visual-footer .green-dot { width: 5px; height: 5px; box-shadow: none; }
+/* setup */
+.setup-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 15px; margin-top: 4%; }
+.setup-card { position: relative; min-height: 220px; border: 1px solid #e2ebe4; border-radius: 18px; padding: 20px 18px; background: rgba(255,255,255,.9); transition: transform .2s, box-shadow .2s; box-shadow: 0 10px 26px rgba(15,61,46,.045); }
+.setup-card:hover { transform: translateY(-4px); box-shadow: 0 16px 34px rgba(15,61,46,.11); }
+.setup-primary { background: linear-gradient(143deg, #0f3d2e, #1d6946); border-color: #1d6946; color: white; }
+.setup-icon, .setup-logo { width: 46px; height: 46px; border-radius: 13px; display: grid; place-items: center; background: #edf9f0; color: var(--emerald); margin-bottom: 13px; }
+.setup-icon { font-size: 20px; }.setup-primary .setup-icon { color: #c5f6d2; background: rgba(255,255,255,.12); }
+.setup-logo img { width: 29px; height: 29px; }
+.setup-label { display: inline-block; color: #b4eac3; font-size: 8px; font-weight: 800; letter-spacing: .03em; background: rgba(255,255,255,.1); padding: 4px 7px; border-radius: 5px; margin-bottom: 5px; }
+.setup-card h3 { color: var(--forest); direction: ltr; text-align: right; font-size: clamp(14px,1.35vw,18px); margin: 0 0 7px; }
+.setup-primary h3 { color: white; }
+.setup-card p { color: #819087; line-height: 1.8; font-size: clamp(9px,.86vw,11px); margin-bottom: 15px; }
+.setup-primary p { color: #d0e8d7; }
+.setup-link { position: absolute; bottom: 17px; right: 18px; left: 18px; display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #edf1ee; padding-top: 10px; color: var(--emerald); font-size: 10px; font-weight: 800; }
+.setup-primary .setup-link { border-color: rgba(255,255,255,.14); color: #b2f4c5; }
+.setup-check { display: flex; align-items: center; gap: 13px; padding: 12px 15px; border: 1px solid #dcefe1; border-radius: 12px; background: #f4fbf6; margin-top: 17px; }
+.check-ring { flex: 0 0 31px; width: 31px; height: 31px; display: grid; place-items: center; border-radius: 50%; color: white; background: var(--emerald); font-weight: 800; }
+.setup-check div { flex: 1; }
+.setup-check strong { color: var(--forest); font-size: 11px; }
+.setup-check p { margin: 2px 0 0; color: #829188; font-size: clamp(8px,.75vw,10px); }
+.setup-step { color: #2a8a56; font: 700 9px var(--mono); letter-spacing: .1em; }
+/* code */
+.code-layout { display: grid; grid-template-columns: 1.2fr .8fr; align-items: center; gap: 4%; margin-top: 3.5%; }
+.code-window { border-radius: 17px; overflow: hidden; direction: ltr; background: #111c19; box-shadow: 0 18px 40px rgba(13,43,28,.18); }
+.code-titlebar { display: flex; align-items: center; gap: 11px; padding: 11px 14px; color: #c4d8ca; background: #1c2a24; font: 500 10px var(--mono); }
+.code-titlebar .window-dots { margin-right: 3px; }
+.copy-btn { margin-left: auto; display: flex; align-items: center; gap: 7px; border: 1px solid #3a5547; border-radius: 6px; background: #263c30; color: #bde9c9; padding: 6px 8px; font: 600 9px "Cairo",sans-serif; direction: rtl; }
+.copy-btn:hover { background: #315643; }
+.code-block { margin: 0; padding: 9% 4%; overflow: auto; color: #eef6f0; font: 500 clamp(9px,1vw,13px) var(--mono); line-height: 2.8; white-space: pre; }
+.code-line { display: block; direction: ltr; }
+.line-no { color: #627b69; width: 32px; display: inline-block; user-select: none; }
+.code-var { color: #a1d9ff; }.code-op { color: #f4f0c5; }.code-fn { color: #83e4a0; }.code-str { color: #ebd293; }
+.code-status { padding: 8px 13px; display: flex; justify-content: space-between; background: #1d4b32; color: #c1e8cb; font: 500 8px var(--mono); }
+.code-status span:first-child { display: flex; align-items: center; gap: 6px; }.code-status i { width: 5px; height: 5px; border-radius: 50%; background: #6be68b; display: inline-block; }
+.code-explainer { display: flex; flex-direction: column; gap: 17px; }
+.explainer-item { display: flex; align-items: flex-start; gap: 12px; }
+.explainer-number { width: 27px; height: 27px; flex: 0 0 27px; display: grid; place-items: center; background: #e6f8eb; border-radius: 8px; color: var(--emerald); font: 700 9px var(--mono); }
+.explainer-item strong { direction: ltr; display: block; color: var(--forest); text-align: right; font: 700 clamp(10px,1.05vw,14px) var(--mono); }
+.explainer-item p { color: #87948b; font-size: clamp(9px,.84vw,11px); margin: 3px 0 0; }
+.run-prompt { border-top: 1px solid #e6eee8; padding-top: 15px; color: var(--emerald); font-size: clamp(10px,.94vw,13px); font-weight: 800; display: flex; align-items: center; gap: 8px; }
+.run-prompt span { display: grid; place-items: center; width: 24px; height: 24px; border-radius: 7px; background: var(--forest); color: #b1f1c3; font-size: 10px; }
+/* challenge */
+.challenge-layout { display: grid; grid-template-columns: 1.1fr .9fr; gap: 4%; margin-top: 3%; }
+.challenge-checklist { border: 1px solid #e1ebe3; border-radius: 19px; padding: 18px 21px; background: white; box-shadow: 0 10px 26px rgba(15,61,46,.04); }
+.challenge-heading { display: flex; align-items: center; gap: 11px; margin-bottom: 14px; }
+.challenge-icon { display: grid; place-items: center; width: 38px; height: 38px; background: var(--forest); color: #a5f0b9; border-radius: 12px; font-size: 19px; }
+.challenge-heading h3 { color: var(--forest); font-size: 15px; margin: 0 0 3px; }.challenge-heading p { color: #89958d; font-size: 9px; margin: 0; }
+.challenge-item { display: flex; align-items: center; gap: 12px; padding: 11px 0; border-top: 1px solid #eff3ef; cursor: pointer; }
+.challenge-item input { display: none; }
+.custom-check { position: relative; width: 19px; height: 19px; flex: 0 0 19px; border: 1.5px solid #cbd9cf; border-radius: 6px; background: #fbfdfb; }
+.challenge-item input:checked + .custom-check { background: var(--emerald); border-color: var(--emerald); }
+.challenge-item input:checked + .custom-check::after { content: "✓"; position: absolute; inset: -1px 0 0; display: grid; place-items: center; color: white; font-size: 12px; font-weight: 900; }
+.challenge-item strong, .challenge-item small { display: block; }.challenge-item strong { color: var(--forest); font-size: clamp(10px,.95vw,13px); }.challenge-item small { color: #8b9890; font-size: clamp(8px,.75vw,10px); margin-top: 2px; }.challenge-item input:checked ~ span:last-child strong { color: #7e9384; text-decoration: line-through; }
+.challenge-progress { display: flex; align-items: center; gap: 14px; margin-top: 15px; }
+.challenge-progress-track { flex: 1; height: 5px; background: #eaf1eb; border-radius: 10px; overflow: hidden; }.challenge-progress-track span { width: 0; height: 100%; display: block; background: var(--mint); transition: width .2s; }
+.challenge-progress small { color: #8a968f; font-size: 9px; white-space: nowrap; }.challenge-progress b { color: var(--emerald); font: 700 10px var(--mono); }
+.challenge-side { position: relative; border-radius: 19px; padding: 9% 8%; background: linear-gradient(145deg, #f0faf3, #e6f7eb); border: 1px solid #dcefe1; overflow: hidden; }
+.challenge-side::after { content:""; position:absolute; right:-80px; bottom:-95px; width:210px; height:210px; border-radius:50%; border:1px solid rgba(31,122,92,.14); box-shadow:0 0 0 14px rgba(31,122,92,.04),0 0 0 29px rgba(31,122,92,.03); }
+.side-orb { display: grid; place-items: center; width: 55px; height: 55px; border-radius: 17px; background: var(--forest); color: #a9efbd; font: 900 29px var(--mono); margin-bottom: 8%; }
+.challenge-side h3 { color: var(--forest); font-size: clamp(17px,1.8vw,24px); margin-bottom: 10px; }.challenge-side p { color: #718177; font-size: clamp(10px,.95vw,13px); line-height: 1.9; }
+.debug-tip { position: relative; z-index: 1; display: flex; flex-direction: column; gap: 4px; border-right: 3px solid var(--mint); padding: 9px 12px; background: rgba(255,255,255,.6); border-radius: 6px; }.debug-tip strong { color: var(--emerald); font-size: 10px; }.debug-tip span { color: #506b59; font-size: clamp(9px,.84vw,11px); font-weight: 700; }
+/* debug */
+.debug-layout { display: grid; grid-template-columns: 1.08fr .92fr; gap: 5%; margin-top: 4%; align-items: center; }
+.terminal-window { border-radius: 15px; overflow: hidden; background: #101b17; color: #d7eadb; direction: ltr; box-shadow: 0 17px 40px rgba(10,39,27,.17); }
+.terminal-head { display:flex; gap:12px; align-items:center; padding:12px 15px; background:#1b2922; font:500 9px var(--mono); color:#9bb6a2; }
+.terminal-body { min-height: 210px; padding: 24px 20px; font: 500 clamp(9px,.9vw,12px) var(--mono); }
+.terminal-body p { margin: 0 0 13px; }.terminal-prompt { color: #7de69b; }.terminal-error { color: #ff928b; }.terminal-muted { color: #90a99a; }
+.terminal-cursor { width: 7px; height: 14px; background: #7de69b; animation: blink 1s steps(2,start) infinite; }
+@keyframes blink { to { visibility: hidden; } }
+.debug-rules { display: flex; flex-direction: column; gap: 17px; }
+.debug-rule { display: flex; align-items: center; gap: 13px; }
+.rule-number { width: 36px; height: 36px; display:grid; place-items:center; border:1px solid #cde8d4; background:#edf9f0; color:var(--emerald); border-radius:11px; font:700 10px var(--mono); }
+.debug-rule strong, .debug-rule small { display:block; }.debug-rule strong { color:var(--forest); font-size:clamp(11px,1.05vw,14px); }.debug-rule small { color:#89958c; font-size:clamp(9px,.82vw,11px); margin-top:3px; }
+.debug-bottom { display:flex; align-items:center; gap:11px; border-top:1px solid #e7efe8; margin-top:3%; padding-top:15px; color:#63786a; font-size:clamp(10px,.92vw,12px); font-weight:700; }
+/* recap */
+.recap-layout { display: grid; grid-template-columns: .95fr 1.05fr; gap: 4%; margin-top: 4%; align-items: stretch; }
+.recap-items { display: flex; flex-direction: column; gap: 11px; }
+.recap-item { display: flex; align-items:center; gap: 12px; background:white; border:1px solid #e3ece5; border-radius:11px; padding:11px 13px; }
+.recap-item span { flex:0 0 26px; width:26px; height:26px; display:grid; place-items:center; border-radius:50%; background:#e3f8e9; color:#20804c; font-size:12px; font-weight:900; }
+.recap-item p { margin:0; color:#607268; font-size:clamp(9px,.87vw,12px); line-height:1.65; }
+.recap-question { position:relative; display:flex; flex-direction:column; justify-content:center; padding:8% 9%; border-radius:20px; background:linear-gradient(135deg,#0f3d2e,#1d6946); overflow:hidden; }
+.recap-question::after { content:""; width:220px; height:220px; border:1px solid rgba(255,255,255,.15); border-radius:50%; position:absolute; bottom:-130px; left:-50px; box-shadow:0 0 0 15px rgba(255,255,255,.025),0 0 0 30px rgba(255,255,255,.025); }
+.question-label { align-self:flex-start; color:#b1efc2; background:rgba(255,255,255,.1); border:1px solid rgba(255,255,255,.13); padding:5px 9px; border-radius:6px; font-size:9px; margin-bottom:7%; }
+.recap-question h3 { color:white; font-size:clamp(16px,1.65vw,22px); line-height:1.9; margin:0 0 6%; }.recap-question p { color:#c5e0cd; font-size:clamp(10px,.92vw,12px); line-height:1.8; margin:0; }
+.recap-mark { position:absolute; left:8%; bottom:6%; color:rgba(255,255,255,.12); font:900 45px var(--mono); direction:ltr; }.recap-mark span { color:rgba(157,240,181,.3); }
+/* homework */
+.homework-card { display: grid; grid-template-columns: .94fr 1.06fr; border-radius:21px; border:1px solid #dcece0; overflow:hidden; margin-top:3%; background:white; box-shadow:0 13px 35px rgba(15,61,46,.065); }
+.homework-side { padding:7% 8%; color:white; background:linear-gradient(145deg,#0f3d2e,#1e6b48); position:relative; overflow:hidden; }
+.homework-side::after { content:""; position:absolute; width:200px;height:200px;border-radius:50%;border:1px solid rgba(255,255,255,.13);left:-95px;bottom:-90px;box-shadow:0 0 0 17px rgba(255,255,255,.025),0 0 0 34px rgba(255,255,255,.025); }
+.homework-mark { font:900 clamp(40px,5vw,68px) var(--mono); line-height:1; color:#baf5c9; direction:ltr; text-align:right; }.homework-mark span { color:#52d783; }
+.homework-mini-label { display:block; direction:ltr; text-align:right; font:600 8px var(--mono); letter-spacing:.12em; color:#a7d9b5; margin:8px 0 22px; }
+.homework-side h3 { color:white; font-size:clamp(17px,1.7vw,23px); margin:0 0 9px; }.homework-side p { color:#cbe3d1; font-size:clamp(10px,.93vw,12px); line-height:1.9; }
+.homework-side a { display:inline-block; position:relative; z-index:1; border:1px solid rgba(255,255,255,.25); background:rgba(255,255,255,.08); color:#c0f5cd; padding:9px 13px; border-radius:8px; font-size:10px; font-weight:800; }
+.homework-tasks { padding:6% 7%; }
+.homework-tasks h4 { color:var(--forest); font-size:13px; margin:0 0 4%; }
+.homework-tasks label { display:flex; align-items:center; gap:10px; margin-bottom:16px; cursor:pointer; color:#65756b; font-size:clamp(9px,.9vw,12px); }
+.homework-tasks input { appearance:none; width:17px;height:17px; border:1.5px solid #c8d9cd; border-radius:5px; display:inline-grid;place-content:center; flex:0 0 17px; }
+.homework-tasks input:checked { background:var(--emerald); border-color:var(--emerald); }.homework-tasks input:checked::before { content:"✓"; color:white; font-size:11px; font-weight:900; }
+.next-lesson { display:flex; align-items:center; justify-content:space-between; gap:10px; border-top:1px solid #e8efe9; padding-top:14px; margin-top:5px; }.next-lesson span { color:#87948b; font-size:9px; white-space:nowrap; }.next-lesson strong { color:var(--emerald); font-size:clamp(8px,.78vw,10px); }
+.closing-line { display:flex; align-items:center; gap:12px; position:relative; margin-top:2.3%; overflow:hidden; }.closing-line .brand-mark { width:31px;height:27px; }.closing-line strong { color:#3d6d4e; font-size:clamp(11px,1vw,14px); }.closing-glow { height:1px; flex:1; background:linear-gradient(90deg,#b2e4c0,transparent); }
+/* resources */
+.final-slide { background: radial-gradient(ellipse at 100% 0%, rgba(33,192,91,.075), transparent 42%), linear-gradient(145deg,#fff,#f4faf5); }
+.resource-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px 13px; margin-top:3%; }
+.resource-grid a { display:flex; align-items:center; gap:13px; padding:11px 13px; min-height:54px; border:1px solid #e1ebe3; background:rgba(255,255,255,.88); border-radius:11px; transition:transform .2s,border-color .2s; }
+.resource-grid a:hover { transform:translateY(-2px); border-color:#b6dfc2; }
+.resource-grid img { width:27px;height:27px;object-fit:contain; }.resource-grid span:nth-child(2) { flex:1; }.resource-grid strong,.resource-grid small { display:block; }.resource-grid strong { color:var(--forest); font-size:clamp(10px,.95vw,13px); }.resource-grid small { color:#8b9890; font-size:clamp(8px,.73vw,10px); margin-top:2px; }.resource-grid a>b { color:#8ea194; font-size:15px; font-family:var(--mono); }
+.resource-symbol { flex:0 0 27px; width:27px; height:27px; display:grid; place-items:center; border-radius:8px; background:#e7f7eb; color:var(--emerald); font-size:14px; font-weight:900; }.atcoder-symbol { background:#1d2522;color:white;font:900 16px var(--mono); }
+.final-footer { display:flex; align-items:center; justify-content:space-between; gap:15px; border-top:1px solid #e3ece5; margin-top:3%; padding-top:17px; }.final-footer div { display:flex; align-items:center; gap:9px; color:var(--forest); font-size:10px; font-weight:800; }.final-footer .brand-mark { width:29px;height:25px;border-radius:7px;font-size:10px; }.final-footer strong { color:#5e7766; font-size:clamp(10px,.95vw,13px); }.final-footer button { border:1px solid #cae6d2; border-radius:8px; color:var(--emerald); background:#f4fbf6; padding:8px 12px; font-size:10px; font-weight:800; }
+/* responsive */
+@media (max-width: 1100px) and (min-width: 701px) {
+  .slide { padding: 9.5% 5.5% 10%; }
+  .hero-slide { padding-top: 10%; }.profile-layout { margin-top: 2%; }.why-card { min-height: 180px; padding: 15px 13px; }.specialty-card { min-height: 95px; padding: 10px; }.setup-card { min-height: 195px; padding: 15px; }.tool-row { padding: 7px 9px; }.notes-panel { bottom: 9.5%; }
+}
+@media (max-width: 700px) {
+  body { overflow: hidden; }
+  .stage { display:block; }
+  .deck { width:100vw;height:100dvh;aspect-ratio:auto;border-radius:0;box-shadow:none; }
+  .topline { top:17px; right:18px; left:18px; gap:7px; font-size:9px; }.brand-mark { width:29px;height:26px;border-radius:8px;font-size:10px; }.course-label { display:none; }.topline-sep { display:none; }
+  .slide { inset:0; padding:73px 21px 110px; overflow-y:auto; overflow-x:hidden; }.slide::after { top:59px; left:21px; width:34%; }
+  h2 { font-size:27px; margin-bottom:9px; }.section-kicker { font-size:9px; margin-bottom:8px; }.section-subtitle { font-size:11px; margin-bottom:18px; }.slide-index { display:none; }
+  .hero-slide { display:flex; flex-direction:column; justify-content:flex-start; gap:10px; padding-top:80px; }.hero-copy { padding-bottom:0; width:100%; }.hero-copy h1 { font-size:56px; margin:11px 0 12px; }.hero-lead { font-size:13px; margin-bottom:13px; }.hero-meta { margin-bottom:14px; }.hero-visual { min-height:0; height:255px; width:100%; flex:0 0 255px; }.image-frame { width:72%; height:87%; border-radius:22px 22px 55px 22px; }.float-chip { padding:8px 10px;font-size:10px; }.float-chip img { width:19px;height:19px; }.chip-python { top:8%;left:4%; }.chip-brackets { bottom:6%;right:5%; }.hero-stamp { width:60px;height:60px;left:7%;bottom:2%; }.hero-stamp span { font-size:20px; }.hero-signature small { font-size:9px; }
+  .profile-layout,.path-layout,.salary-layout,.algorithm-layout,.tools-layout,.code-layout,.challenge-layout,.debug-layout,.recap-layout,.homework-card { grid-template-columns:1fr; height:auto; gap:14px; }
+  .profile-layout { margin-top:18px; }.profile-main { grid-template-columns:60px 1fr; padding:16px; gap:0 13px; }.profile-monogram { width:58px;height:58px;border-radius:16px;font-size:34px; }.profile-main h3 { font-size:19px; }.profile-title { font-size:10px; }.profile-bio { font-size:11px; }.profile-tags { padding-top:12px; }.profile-side { gap:8px; }.profile-note { padding:14px; }
+  .agenda-grid { grid-template-columns:1fr; gap:8px; margin-top:17px; }.agenda-item { min-height:61px; padding:9px 10px; }.agenda-footer { padding-top:14px;font-size:10px; }
+  .definition-banner { margin:18px 0;padding:15px; }.definition-banner p { font-size:14px; }.quote-mark { font-size:44px; }.io-flow { grid-template-columns:1fr; gap:6px; }.flow-arrow { transform:rotate(-90deg); font-size:20px; line-height:1; }.io-card { padding:10px; }.io-icon { width:30px;height:30px;font-size:17px; }.definition-bottom { margin-top:16px;gap:12px;padding:10px; }.definition-bottom strong { font-size:10px; }
+  .why-grid { grid-template-columns:1fr 1fr; gap:9px; margin-top:18px; }.why-card { min-height:160px;padding:13px; }.why-icon { width:35px;height:35px;font-size:18px;margin-bottom:11px; }.why-card h3 { font-size:13px; }.why-card p { font-size:10px; }.bottom-callout { align-items:flex-start;padding:10px;gap:9px; }.bottom-callout p { font-size:10px; }
+  .specialty-grid { grid-template-columns:1fr 1fr;gap:8px;margin-top:15px; }.specialty-card { min-height:135px;display:block;padding:11px; }.specialty-icon { margin-bottom:7px;width:30px;height:30px; }.specialty-card h3 { font-size:12px; }.specialty-card p { font-size:9px; }.specialty-card small { font-size:8px; }.featured-label { position:static;display:inline-block;margin-top:6px; }
+  .path-layout { margin-top:16px; }.path-left { order:1; }.path-right { order:0;padding:18px; }.logic-orb { width:70px;height:70px;margin-bottom:12px; }.orb-code {font-size:24px;}.path-right h3 {font-size:19px;}.path-right p {font-size:11px;}.path-step {padding:10px;}.path-step h3 {font-size:16px;}.path-connector { height:10px; }
+  .salary-layout { margin-top:15px; }.salary-number-card { padding:20px; }.salary-number { font-size:42px;margin:23px 0 10px; }.salary-label { font-size:9px; }.salary-number-card p {font-size:11px;}.salary-facts {gap:8px;}.salary-fact {padding:10px;}.salary-fact p {font-size:10px;}.salary-disclaimer { font-size:9px;line-height:1.8;margin-top:13px; }
+  .contest-grid { grid-template-columns:1fr; gap:10px; margin-top:18px; }.contest-card { padding:14px; }.contest-top { margin-bottom:9px; }.contest-top img,.atcoder-mark { width:30px;height:30px; }.contest-card h3 { font-size:16px; }.contest-card p { min-height:0;margin-bottom:10px;font-size:11px; }.contest-action { padding-top:8px; }.contest-tip { align-items:flex-start;gap:8px;padding:10px;margin-top:12px; }.contest-tip strong { font-size:10px;line-height:1.7; }
+  .algorithm-layout { margin-top:12px; }.algorithm-visual { width:100%;padding:12px 20px; }.algo-node { font-size:10px; }.algorithm-copy { padding:0; }.big-quote { font-size:60px;top:-2px; }.algorithm-copy h3 { font-size:21px; }.algorithm-copy > p { font-size:11px; }.question-card { margin:12px 0;padding:11px; }.micro-note { font-size:9px !important; }
+  .tools-layout { margin-top:16px; }.tool-row { padding:8px; }.tool-symbol {width:31px;height:31px;flex-basis:31px;}.tool-example {font-size:8px;}.tool-visual {transform:none;}.editor-preview { padding:23px 15px; font-size:9px; }
+  .setup-grid { grid-template-columns:1fr;gap:10px;margin-top:15px; }.setup-card { min-height:170px;padding:15px; }.setup-card h3 {font-size:17px;}.setup-card p {font-size:11px;max-width:270px;}.setup-check { margin-top:12px;align-items:flex-start; }.setup-check p {font-size:9px;line-height:1.7; }.setup-step {display:none;}
+  .code-layout { margin-top:15px; }.code-window { width:100%; }.code-titlebar {flex-wrap:wrap;padding:9px;gap:7px;}.code-block { padding:18px 9px;font-size:8px;line-height:2.7; }.line-no { width:22px; }.code-status { font-size:7px; }.code-explainer { display:grid;grid-template-columns:1fr 1fr;gap:12px; }.explainer-item { gap:8px; }.explainer-number {width:23px;height:23px;flex-basis:23px;}.explainer-item strong {font-size:10px;}.explainer-item p {font-size:9px;}.run-prompt { grid-column:1/-1;font-size:11px;padding-top:10px; }
+  .challenge-layout { margin-top:15px; }.challenge-checklist {padding:14px;}.challenge-heading h3 {font-size:14px;}.challenge-item strong {font-size:10px;}.challenge-item small {font-size:9px;}.challenge-side {padding:16px;}.challenge-side h3 {font-size:20px;}.challenge-side p {font-size:11px;}
+  .debug-layout { margin-top:15px; }.terminal-body {min-height:160px;padding:20px 15px;font-size:10px;}.debug-rules {gap:12px;}.debug-rule strong {font-size:12px;}.debug-rule small {font-size:10px;}.debug-bottom {font-size:10px;line-height:1.7;margin-top:15px;}
+  .recap-layout { margin-top:15px; }.recap-items {gap:8px;}.recap-item {padding:9px;}.recap-item p {font-size:10px;}.recap-question {padding:18px;min-height:220px;}.recap-question h3 {font-size:19px;}.recap-question p {font-size:11px;}
+  .homework-card { margin-top:15px; }.homework-side {padding:22px;}.homework-mark {font-size:47px;}.homework-mini-label {margin-bottom:15px;}.homework-side h3 {font-size:21px;}.homework-side p {font-size:11px;}.homework-tasks {padding:18px;}.homework-tasks label {font-size:10px;margin-bottom:13px;}.next-lesson {align-items:flex-start;flex-direction:column;gap:5px;}.closing-line {margin-top:14px;}.closing-line strong {font-size:11px;}
+  .resource-grid { grid-template-columns:1fr;gap:8px;margin-top:15px; }.resource-grid a {min-height:53px;padding:9px 11px;}.resource-grid strong {font-size:11px;}.resource-grid small {font-size:9px;}.final-footer { flex-wrap:wrap;margin-top:16px;padding-top:13px; }.final-footer strong {order:3;width:100%;font-size:11px;}.final-footer button {font-size:9px;}
+  .deck-controls { bottom:10px;left:12px;right:12px;padding:6px;border-radius:13px; }.control-btn {min-width:32px;height:33px;}.text-control { padding:0 8px;font-size:9px; }.keyboard-help {display:none;}.notes-panel {left:12px;right:12px;bottom:61px;padding:10px 12px;max-height:28vh;overflow:auto;}.notes-panel p {font-size:10px;}.notes-label {font-size:10px;}.deck.notes-visible .slide {padding-bottom:180px;}
+}
+@media (prefers-reduced-motion: reduce) { *,*::before,*::after { transition:none !important; animation:none !important; scroll-behavior:auto !important; } }
+@media print {
+  body { overflow:visible; background:white; }
+  .stage { display:block; height:auto; }
+  .deck { width:100%; height:auto; max-height:none; overflow:visible; box-shadow:none; }
+  .topline,.progress-track,.deck-controls,.notes-panel,.toast,.ambient { display:none !important; }
+  .slide { position:relative; opacity:1 !important; visibility:visible !important; transform:none !important; height:56.25vw; page-break-after:always; break-after:page; overflow:hidden; print-color-adjust:exact; -webkit-print-color-adjust:exact; }
+  .slide-index { display:block; }
+}
+
+  </style>
+</head>
+<body>
+  <div class="ambient ambient-one"></div><div class="ambient ambient-two"></div>
+  <main class="stage" aria-label="عرض أساسيات البرمجة">
+    <div class="deck" id="deck">
+      <div class="topline"><span class="brand-mark">&lt;/&gt;</span><span class="brand-name">عبد الرحمن العظم</span><span class="topline-sep"></span><span class="course-label">أساسيات البرمجة · الجلسة الأولى</span></div>
+      <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+
+      <section class="slide active hero-slide" data-title="أساسيات البرمجة" data-time="00:00–00:05" data-notes="ابدأ بالتعارف وكسر رهبة البداية. اسأل الطالبة: لو أردتِ أن تجعلي الحاسوب ينجز مهمة عنك، كيف ستشرحين له المطلوب؟ لا تدخل مباشرة في المصطلحات؛ اربط الدرس بأمثلة من الحياة اليومية." aria-label="الشريحة 1">
+        <div class="hero-copy">
+          <div class="eyebrow"><span class="live-dot"></span> من الصفر · خطوة بخطوة</div>
+          <h1>أساسيات<br><span class="text-gradient">البرمجة</span></h1>
+          <p class="hero-lead">كيف نفكّر كمبرمجين؟ وكيف نحوّل فكرة بسيطة إلى برنامج يعمل؟</p>
+          <div class="hero-meta"><span class="meta-pill">90 دقيقة</span><span class="meta-pill">تطبيق عملي</span><span class="meta-pill">Python كبداية</span></div>
+          <div class="hero-signature"><span class="signature-line"></span><div><strong>تقديم: عبد الرحمن العظم</strong><small>Front-End Developer · UI/UX Designer · مدرّب تقني</small></div></div>
+        </div>
+        <div class="hero-visual" aria-hidden="true">
+          <div class="orbit orbit-a"></div><div class="orbit orbit-b"></div>
+          <div class="image-frame"><img src="https://www.vitasjordan.com/uploads/2026/07/chatgpt-image-jul-15-2026-103814-am.png" alt="مطور يعمل على الحاسوب" onerror="this.style.display='none';document.querySelector('.image-fallback').style.display='grid'"><div class="image-fallback"><span class="fallback-code">&gt;_</span><code>print("Hello, world!")</code><small>YOUR FIRST LINE OF CODE</small></div><div class="image-shade"></div></div>
+          <div class="float-chip chip-python"><img src="https://cdn.simpleicons.org/python/3776AB" alt=""><span>Python</span></div>
+          <div class="float-chip chip-brackets"><span class="chip-bracket">{ }</span><span>Logic first</span></div>
+          <div class="hero-stamp"><span>01</span><small>START<br>HERE</small></div>
+        </div>
+        <div class="slide-index">01 <span>/ 18</span></div>
+      </section>
+
+      <section class="slide" data-title="من هو المدرّب؟" data-time="00:05–00:07" data-notes="عرّف عن نفسك باختصار وبأسلوب إنساني: خلفيتك تجمع بين المجال التقني والدقة العملية، واهتمامك الحالي بتطوير الواجهات وتجربة المستخدم. الهدف أن تعرف الطالبة من سيقود الرحلة ولماذا يهتم بتبسيط المعرفة، وليس استعراض السيرة الذاتية كاملة." aria-label="الشريحة 2">
+        <div class="section-kicker">01 / تعارف سريع</div><h2>قبل أن نبدأ… <span class="text-gradient">من أنا؟</span></h2>
+        <div class="profile-layout">
+          <div class="profile-main glass-panel"><div class="profile-monogram">ع<span>.</span></div><div><h3>عبد الرحمن العظم</h3><p class="profile-title">مطور واجهات أمامية ومصمم UI/UX</p><p class="profile-bio">أجمع بين خلفية تقنية، ودقّة العمل في تصميم التعويضات السنية الرقمية، وشغف بناء تجارب ويب واضحة وسهلة الاستخدام.</p><p class="profile-bio">أهتم بتحويل الأفكار إلى واجهات عملية، وتبسيط المفاهيم التقنية للمبتدئين عبر الشرح والتطبيق.</p></div><div class="profile-tags"><span>Front-End</span><span>UI/UX</span><span>تدريب تقني</span><span>تصميم رقمي ثلاثي الأبعاد</span></div></div>
+          <div class="profile-side"><div class="mini-stat"><span class="stat-icon">⌘</span><div><strong>منطق + تصميم</strong><small>أفهم المشكلة، ثم أصمم الحل</small></div></div><div class="mini-stat"><span class="stat-icon">↗</span><div><strong>تعلّم بالممارسة</strong><small>مفاهيم قصيرة وتجارب مباشرة</small></div></div><div class="mini-stat"><span class="stat-icon">&lt;/&gt;</span><div><strong>الهدف النهائي</strong><small>الوصول إلى تطوير واجهات الويب</small></div></div><div class="profile-note">«أفضل طريقة لتعلّم البرمجة هي أن نكتب الكود، ونجرّبه، ونفهم لماذا يعمل.»</div></div>
+        </div>
+      </section>
+
+      <section class="slide" data-title="خريطة الجلسة" data-time="00:07–00:10" data-notes="استعرض الخريطة بسرعة، واشرح أن هذا لقاء تعريفي تطبيقي وليس كورساً نظرياً طويلاً. أخبر الطالبة أن الهدف اليوم الخروج بفهم للصورة الكبيرة، وتشغيل أول برنامج، ومعرفة الخطوة القادمة." aria-label="الشريحة 3">
+        <div class="section-kicker">02 / خريطة الطريق</div><h2>رحلة اليوم في <span class="text-gradient">90 دقيقة</span></h2><p class="section-subtitle">كل فقرة تمهّد لما بعدها — وفي النهاية سنشغّل أول برنامج.</p>
+        <div class="agenda-grid">
+          <div class="agenda-item"><span class="agenda-number">01</span><div><strong>ما هي البرمجة؟</strong><small>الفكرة والخوارزمية</small></div><b>15 د</b></div>
+          <div class="agenda-item"><span class="agenda-number">02</span><div><strong>اختصاصات البرمجة</strong><small>أين يمكن أن نتخصص؟</small></div><b>12 د</b></div>
+          <div class="agenda-item"><span class="agenda-number">03</span><div><strong>الفرص والدخل</strong><small>نظرة واقعية للسوق</small></div><b>8 د</b></div>
+          <div class="agenda-item"><span class="agenda-number">04</span><div><strong>المسابقات والأدوات</strong><small>كيف يتدرّب المبرمج؟</small></div><b>18 د</b></div>
+          <div class="agenda-item agenda-highlight"><span class="agenda-number">05</span><div><strong>تجهيز البيئة والتطبيق</strong><small>نكتب الكود ونشغّله</small></div><b>25 د</b></div>
+          <div class="agenda-item"><span class="agenda-number">06</span><div><strong>مراجعة وواجب</strong><small>خطوتنا التالية</small></div><b>12 د</b></div>
+        </div>
+        <div class="agenda-footer"><span class="live-dot"></span> الأولوية للتجربة والفهم، لا لحفظ التعريفات.</div>
+      </section>
+
+      <section class="slide" data-title="ما هي البرمجة؟" data-time="00:10–00:15" data-notes="استخدم مثالاً بسيطاً: آلة بيع أو تطبيق طقس. البرنامج يستقبل بيانات، يعالجها وفق قواعد، ثم يعرض نتيجة. وضّح أن الحاسوب لا يعرف ما نريده من تلقاء نفسه؛ علينا وصف الخطوات والتعليمات بدقة. بعدها ميّز بين الخوارزمية (ترتيب الحل) والكود (كتابة هذا الحل بلغة يفهمها الحاسوب)." aria-label="الشريحة 4">
+        <div class="section-kicker">03 / الفكرة الأساسية</div><h2>ما هي <span class="text-gradient">البرمجة؟</span></h2>
+        <div class="definition-banner"><span class="quote-mark">“</span><p>البرمجة هي كتابة تعليمات واضحة ومنطقية للحاسوب كي ينفّذ مهمة أو يحل مشكلة.</p></div>
+        <div class="io-flow"><div class="io-card"><div class="io-icon">↘</div><span class="flow-label">INPUT</span><h3>مدخلات</h3><p>اسم، رقم، صورة، أو نقرة</p></div><div class="flow-arrow">←</div><div class="io-card io-process"><div class="io-icon">⚙</div><span class="flow-label">PROCESS</span><h3>معالجة</h3><p>تعليمات وقواعد منطقية</p></div><div class="flow-arrow">←</div><div class="io-card"><div class="io-icon">✓</div><span class="flow-label">OUTPUT</span><h3>مخرجات</h3><p>نتيجة أو رسالة أو إجراء</p></div></div>
+        <div class="definition-bottom"><div><span class="little-label">الخوارزمية</span><strong>خطة الحل خطوة بخطوة</strong></div><div class="definition-divider"></div><div><span class="little-label">الكود</span><strong>ترجمة الخطة إلى لغة برمجة</strong></div></div>
+      </section>
+
+      <section class="slide" data-title="لماذا نتعلم البرمجة؟" data-time="00:15–00:20" data-notes="اسأل: ما مشكلة يومية تودّين أن يحلها تطبيق؟ اسمح بإجابات مثل تنظيم المصروف، تذكير بالمواعيد، أو موقع لعرض الأعمال. اربط كل إجابة بأن البرمجة وسيلة لصناعة الحل، وليست مجرد كتابة رموز." aria-label="الشريحة 5">
+        <div class="section-kicker">04 / الدافع</div><h2>لماذا نتعلّم <span class="text-gradient">البرمجة؟</span></h2><p class="section-subtitle">لأنها تمنحنا القدرة على بناء الحلول، لا الاكتفاء باستخدامها.</p>
+        <div class="why-grid">
+          <article class="why-card"><div class="why-icon icon-green">✦</div><h3>نحلّ المشكلات</h3><p>نحوّل المشكلة الكبيرة إلى خطوات صغيرة يمكن تنفيذها.</p><span class="card-index">01</span></article>
+          <article class="why-card"><div class="why-icon icon-blue">↗</div><h3>نؤتمت المهام</h3><p>نجعل الحاسوب ينجز الأعمال المتكررة بدلاً منا.</p><span class="card-index">02</span></article>
+          <article class="why-card"><div class="why-icon icon-gold">▦</div><h3>نبني منتجات</h3><p>مواقع وتطبيقات وأدوات تساعد أشخاصاً حقيقيين.</p><span class="card-index">03</span></article>
+          <article class="why-card"><div class="why-icon icon-purple">◎</div><h3>نوسّع خياراتنا</h3><p>نفتح أبواب التعلم والعمل الحر والتخصصات التقنية.</p><span class="card-index">04</span></article>
+        </div>
+        <div class="bottom-callout"><span>تذكّر</span><p>المبرمج الجيد لا يبدأ بسؤال «ما الكود؟» بل «ما المشكلة التي أحاول حلّها؟»</p></div>
+      </section>
+
+      <section class="slide" data-title="اختصاصات البرمجة" data-time="00:20–00:30" data-notes="لا تحاول شرح كل اختصاص بالتفصيل. أعطِ جملة أو مثالاً لكل بطاقة. ابدأ بالفرونت إند لأنه المسار الذي سنصل إليه لاحقاً، ثم اعرض بقية المسارات لتوضيح تنوّع المجال. وضّح أن المسارات تتداخل ويمكن الجمع بينها." aria-label="الشريحة 6">
+        <div class="section-kicker">05 / الصورة الكبيرة</div><h2>البرمجة ليست <span class="text-gradient">طريقاً واحداً</span></h2><p class="section-subtitle">هذه أشهر المسارات، ولكل مسار نوع مختلف من المشكلات.</p>
+        <div class="specialty-grid">
+          <article class="specialty-card featured-specialty"><span class="specialty-icon">◧</span><div><h3>Front-End</h3><p>بناء الجزء الذي يراه المستخدم ويتفاعل معه.</p><small>HTML · CSS · JavaScript</small></div><span class="featured-label">مسارنا المستقبلي</span></article>
+          <article class="specialty-card"><span class="specialty-icon">⌘</span><div><h3>Back-End</h3><p>الخوادم، قواعد البيانات، والمنطق خلف التطبيق.</p><small>APIs · Databases</small></div></article>
+          <article class="specialty-card"><span class="specialty-icon">▣</span><div><h3>Mobile</h3><p>تطبيقات الهواتف والأجهزة اللوحية.</p><small>Android · iOS</small></div></article>
+          <article class="specialty-card"><span class="specialty-icon">∑</span><div><h3>Data & AI</h3><p>تحليل البيانات وبناء أنظمة ذكية.</p><small>Python · Statistics</small></div></article>
+          <article class="specialty-card"><span class="specialty-icon">⌁</span><div><h3>Cybersecurity</h3><p>حماية الأنظمة واكتشاف الثغرات بشكل أخلاقي.</p><small>Security · Networks</small></div></article>
+          <article class="specialty-card"><span class="specialty-icon">◈</span><div><h3>Game Development</h3><p>تصميم الألعاب وتفاعلاتها ومحركاتها.</p><small>Gameplay · Engines</small></div></article>
+          <article class="specialty-card"><span class="specialty-icon">⚙</span><div><h3>Software & Automation</h3><p>برامج مكتبية وأدوات تختصر الوقت والجهد.</p><small>Tools · Systems</small></div></article>
+        </div>
+      </section>
+
+      <section class="slide" data-title="لمحة عن Front-End" data-time="00:30–00:32" data-notes="اربط هذا المسار بهدف التعلم: سنبدأ بمنطق البرمجة حتى نفهم كيف نكتب خطوات واضحة، ثم ننتقل إلى HTML لبناء الهيكل، وCSS لتنسيق الشكل، وJavaScript لإضافة السلوك والتفاعل. Python في هذا الدرس أداة تأسيس منطقية، وليست بديلاً عن لغات الويب الثلاث." aria-label="الشريحة 7">
+        <div class="section-kicker">06 / المسار المستقبلي</div><h2>منطق البرمجة اليوم… <span class="text-gradient">واجهات الويب لاحقاً</span></h2>
+        <div class="path-layout"><div class="path-left"><div class="path-step"><span class="step-badge">01</span><div><h3>HTML</h3><p>هيكل الصفحة ومحتواها</p></div><img src="https://cdn.simpleicons.org/html5/E34F26" alt="HTML5"></div><div class="path-connector"></div><div class="path-step"><span class="step-badge">02</span><div><h3>CSS</h3><p>الألوان والتنسيق والتجاوب</p></div><img src="https://cdn.simpleicons.org/css3/1572B6" alt="CSS3"></div><div class="path-connector"></div><div class="path-step"><span class="step-badge">03</span><div><h3>JavaScript</h3><p>التفاعل والمنطق داخل الصفحة</p></div><img src="https://cdn.simpleicons.org/javascript/F7DF1E" alt="JavaScript"></div></div><div class="path-right"><div class="logic-orb"><span class="orb-code">&lt;/&gt;</span><span class="orb-dot dot-one"></span><span class="orb-dot dot-two"></span><span class="orb-dot dot-three"></span></div><h3>لماذا نبدأ بـ Python؟</h3><p>حتى نتدرّب على المتغيرات، والمدخلات، والشروط، والتفكير بخطوات — ثم نستخدم هذا المنطق في أي لغة نتعلمها.</p><div class="python-tag"><img src="https://cdn.simpleicons.org/python/3776AB" alt="Python"><span>Python = بوابة للتفكير البرمجي</span></div></div></div>
+      </section>
+
+      <section class="slide" data-title="الدخل والفرص المهنية" data-time="00:32–00:40" data-notes="شدّد على أن الدخل يتأثر بالبلد، والخبرة، والتخصص، واللغة، ونوعية الشركة أو العملاء. الرقم المعروض هو وسيط راتب سنوي لمطوري البرمجيات في الولايات المتحدة وفق BLS في مايو 2025، ولا يمثل مبتدئاً أو سوق سوريا أو العمل الحر مباشرة. استخدمه لإظهار اختلاف الأسواق فقط، لا كوعْد بالدخل." aria-label="الشريحة 8">
+        <div class="section-kicker">07 / نظرة واقعية للسوق</div><h2>هل البرمجة <span class="text-gradient">مهنة مجزية؟</span></h2>
+        <div class="salary-layout"><div class="salary-number-card"><span class="salary-label">الولايات المتحدة · مايو 2025</span><div class="salary-number">$135,980</div><p>وسيط الأجر السنوي لمطوّري البرمجيات</p><div class="salary-bar"><span></span></div><div class="salary-source"><span>المصدر: U.S. Bureau of Labor Statistics</span><a href="https://www.bls.gov/ooh/computer-and-information-technology/software-developers.htm" target="_blank" rel="noopener">عرض المصدر ↗</a></div></div><div class="salary-facts"><div class="salary-fact"><span class="fact-icon">↗</span><div><strong>نمو متوقّع</strong><p>يتوقع المصدر نمواً بنحو 10% للتوظيف في فئة مطوري البرمجيات وضمان الجودة والاختبار بين 2025 و2035.</p></div></div><div class="salary-fact"><span class="fact-icon">◎</span><div><strong>لا يوجد رقم واحد للجميع</strong><p>الراتب يختلف حسب البلد، والمستوى، والتخصص، والخبرة، ونوع العمل.</p></div></div><div class="salary-fact"><span class="fact-icon">◇</span><div><strong>المهارة قبل الرقم</strong><p>التعلّم المستمر، المشاريع الحقيقية، والتواصل عوامل تصنع الفارق.</p></div></div></div></div>
+        <div class="salary-disclaimer">ملاحظة: هذا وسيط أمريكي وليس راتب بداية العمل، ولا يصلح للمقارنة المباشرة مع كل الأسواق أو العمل الحر.</div>
+      </section>
+
+      <section class="slide" data-title="مسابقات البرمجة" data-time="00:40–00:50" data-notes="اشرح أن مسابقات البرمجة تشبه تمارين العقل: تقرأ المسألة، تحدد المدخلات والمخرجات، تفكر بحل، ثم تختبره. لا تبدأ بحسابات صعبة. في البداية تكفي المسائل السهلة جداً. افتح موقعاً واحداً فقط إن بقي وقت، ولا تجعل إنشاء الحساب يأخذ من زمن التطبيق العملي." aria-label="الشريحة 9">
+        <div class="section-kicker">08 / تحدّي التفكير</div><h2>كيف يتدرّب المبرمجون؟ <span class="text-gradient">بالمسائل</span></h2><p class="section-subtitle">المسابقة ليست سباق كتابة؛ إنها تمرين على فهم المشكلة واختيار حل واضح.</p>
+        <div class="contest-grid"><a class="contest-card codeforces" href="https://codeforces.com/" target="_blank" rel="noopener"><div class="contest-top"><img src="https://cdn.simpleicons.org/codeforces/1F8ACB" alt="Codeforces"><span class="external">↗</span></div><h3>Codeforces</h3><p>مسابقات وتحديات خوارزمية بمستويات متعددة.</p><span class="contest-action">زيارة الموقع <b>↗</b></span></a><a class="contest-card atcoder" href="https://atcoder.jp/" target="_blank" rel="noopener"><div class="contest-top"><span class="atcoder-mark">A</span><span class="external">↗</span></div><h3>AtCoder</h3><p>مسائل منظمة ومسابقات منتظمة لتطوير التفكير.</p><span class="contest-action">زيارة الموقع <b>↗</b></span></a><a class="contest-card leetcode" href="https://leetcode.com/" target="_blank" rel="noopener"><div class="contest-top"><img src="https://cdn.simpleicons.org/leetcode/FFA116" alt="LeetCode"><span class="external">↗</span></div><h3>LeetCode</h3><p>تدريب على حل المشكلات الشائعة وأسئلة المقابلات.</p><span class="contest-action">زيارة الموقع <b>↗</b></span></a></div>
+        <div class="contest-tip"><span>البداية الذكية</span><strong>حلّ مسألة سهلة وافهمها جيداً، أفضل من تخمين حل عشر مسائل.</strong></div>
+      </section>
+
+      <section class="slide" data-title="فكّر كالمبرمج" data-time="00:50–00:54" data-notes="اطلب من الطالبة ترتيب الخطوات قبل رؤية النتيجة. اكتبوا خوارزمية جمع عددين بالكلمات أولاً، ثم طابقوا كل خطوة مع الكود في الشريحة التالية. ذكّرها أن التفكير بالخوارزمية لا يعتمد على لغة البرمجة." aria-label="الشريحة 10">
+        <div class="section-kicker">09 / قبل أن نكتب الكود</div><h2>فكّر بخطوات… ثم <span class="text-gradient">اكتب الكود</span></h2>
+        <div class="algorithm-layout"><div class="algorithm-visual"><span class="algorithm-number">ALGORITHM / 01</span><div class="algo-node start-node">ابدأ</div><div class="algo-line"></div><div class="algo-node input-node">أدخل العدد الأول A</div><div class="algo-line"></div><div class="algo-node input-node">أدخل العدد الثاني B</div><div class="algo-line"></div><div class="algo-node process-node">احسب: A + B</div><div class="algo-line"></div><div class="algo-node output-node">اعرض الناتج</div><div class="algo-line"></div><div class="algo-node end-node">انتهى</div></div><div class="algorithm-copy"><span class="big-quote">01</span><h3>الخوارزمية = وصفة الحل</h3><p>إذا كانت الخطوات غير واضحة لنا، فمن الصعب أن نطلب من الحاسوب تنفيذها.</p><div class="question-card"><span class="question-dot">?</span><div><strong>سؤال سريع</strong><p>ما الذي قد يحدث لو حاولنا عرض الناتج قبل جمع العددين؟</p></div></div><p class="micro-note">لا توجد لغة برمجة في هذه الخطوة — فقط منطق وترتيب.</p></div></div>
+      </section>
+
+      <section class="slide" data-title="أدوات المبرمج" data-time="00:54–00:58" data-notes="وضّح المصطلحات بأمثلة لا بتعريفات مطولة. VS Code محرر كود قابل للتوسعة ويمكن تحويله إلى بيئة عمل متكاملة بإضافات. مفسّر Python هو الذي يشغّل ملفات Python. الطرفية مكان لكتابة أوامر النظام وتشغيل البرامج. مصحّح الأخطاء يساعدنا على معرفة أين ولماذا حدث الخطأ." aria-label="الشريحة 11">
+        <div class="section-kicker">10 / أدوات العمل</div><h2>ما الأدوات التي يحتاجها <span class="text-gradient">المبرمج؟</span></h2>
+        <div class="tools-layout"><div class="tools-list"><div class="tool-row"><span class="tool-symbol symbol-editor">✎</span><div><strong>Code Editor</strong><small>كتابة الكود وتنظيمه</small></div><span class="tool-example">VS Code</span></div><div class="tool-row"><span class="tool-symbol symbol-ide">▧</span><div><strong>IDE</strong><small>كتابة وتشغيل وتصحيح ضمن بيئة واحدة</small></div><span class="tool-example">PyCharm</span></div><div class="tool-row"><span class="tool-symbol symbol-runtime">▶</span><div><strong>Interpreter</strong><small>تنفيذ تعليمات Python</small></div><span class="tool-example">Python</span></div><div class="tool-row"><span class="tool-symbol symbol-terminal">&gt;_</span><div><strong>Terminal</strong><small>تشغيل الأوامر والبرامج</small></div><span class="tool-example">PowerShell</span></div><div class="tool-row"><span class="tool-symbol symbol-debug">⌕</span><div><strong>Debugger</strong><small>فهم الأخطاء وتتبع التنفيذ</small></div><span class="tool-example">Debug Mode</span></div></div><div class="tool-visual"><div class="visual-header"><span class="window-dots"><i></i><i></i><i></i></span><span>hello.py</span><span class="visual-lock">●</span></div><div class="editor-preview"><span class="ln">1</span><code><em>name</em> = <b>input</b>(<i>"Your name? "</i>)</code><span class="ln">2</span><code><b>print</b>(<i>f"Hello, {name}!"</i>)</code><span class="ln">3</span><code><span class="comment"># Run. Learn. Repeat.</span></code></div><div class="visual-footer"><span class="green-dot"></span> Python 3 · Ready to run</div></div></div>
+      </section>
+
+      <section class="slide" data-title="تجهيز بيئة العمل" data-time="00:58–01:10" data-notes="ابدأ بالأسهل: افتح Online Python من الرابط لتجربة الكود من دون تثبيت. إذا كانت الطالبة مستعدة والتثبيت لن يستهلك الوقت، اعرض الموقع الرسمي لـ Python وVS Code. لا تضيع الجلسة في مشاكل التثبيت؛ الهدف أن تشغّل الكود اليوم، ويمكن إعداد البيئة محلياً لاحقاً." aria-label="الشريحة 12">
+        <div class="section-kicker">11 / جهّز مساحة العمل</div><h2>ابدأ بالأبسط… <span class="text-gradient">ثم طوّر بيئتك</span></h2><p class="section-subtitle">كل الروابط مباشرة — اضغط على بطاقة الأداة لفتح موقعها الرسمي.</p>
+        <div class="setup-grid"><a class="setup-card setup-primary" href="https://www.online-python.com/" target="_blank" rel="noopener"><div class="setup-icon online-icon">▶</div><div class="setup-label">الأسرع للدرس</div><h3>Online Python</h3><p>شغّل Python من المتصفح بدون تثبيت.</p><span class="setup-link">افتح المحرر <b>↗</b></span></a><a class="setup-card" href="https://www.python.org/downloads/" target="_blank" rel="noopener"><div class="setup-logo"><img src="https://cdn.simpleicons.org/python/3776AB" alt="Python"></div><h3>Python</h3><p>حمّل المفسّر الرسمي لتشغيل البرامج على جهازك.</p><span class="setup-link">التنزيل الرسمي <b>↗</b></span></a><a class="setup-card" href="https://code.visualstudio.com/" target="_blank" rel="noopener"><div class="setup-logo"><img src="https://cdn.simpleicons.org/visualstudiocode/007ACC" alt="Visual Studio Code"></div><h3>Visual Studio Code</h3><p>محرر كود خفيف مع إضافات تناسب مشاريعك.</p><span class="setup-link">الموقع الرسمي <b>↗</b></span></a></div>
+        <div class="setup-check"><span class="check-ring">✓</span><div><strong>قبل المتابعة</strong><p>تأكّد أن صفحة Python مفتوحة، وأن مكان كتابة الكود واضح، وأن زر التشغيل يعمل.</p></div><span class="setup-step">READY</span></div>
+      </section>
+
+      <section class="slide" data-title="أول برنامج" data-time="01:10–01:16" data-notes="اكتبوا المثال معاً. اشرح أن input يستقبل نصاً من المستخدم، وأن name متغير نخزن فيه القيمة، وأن print يعرض نتيجة. شغّل البرنامج واطلب من الطالبة كتابة اسمها. لا تشرح الأنواع أو f-strings بالتفصيل الآن؛ اكتفِ بفهم ما الذي يحدث عند التشغيل." aria-label="الشريحة 13">
+        <div class="section-kicker">12 / التطبيق العملي</div><h2>أول برنامج لكِ: <span class="text-gradient">رسالة ترحيب</span></h2><p class="section-subtitle">الفكرة: نسأل عن الاسم، نخزّنه، ثم نطبع رسالة مناسبة.</p>
+        <div class="code-layout"><div class="code-window"><div class="code-titlebar"><div class="window-dots"><i></i><i></i><i></i></div><span>hello.py</span><button class="copy-btn" data-copy="name = input(\"ما اسمك؟ \" )\nprint(f\"أهلاً {name}! سعيدون ببدء رحلة البرمجة.\")">نسخ الكود <span>▣</span></button></div><pre class="code-block"><code><span class="code-line"><span class="line-no">1</span><span class="code-var">name</span> <span class="code-op">=</span> <span class="code-fn">input</span>(<span class="code-str">"ما اسمك؟ "</span>)</span><span class="code-line"><span class="line-no">2</span><span class="code-fn">print</span>(<span class="code-str">f"أهلاً {name}! سعيدون ببدء رحلة البرمجة."</span>)</span></code></pre><div class="code-status"><span><i></i> Python 3</span><span>2 lines · beginner friendly</span></div></div><div class="code-explainer"><div class="explainer-item"><span class="explainer-number">01</span><div><strong>input()</strong><p>تستقبل إجابة المستخدم.</p></div></div><div class="explainer-item"><span class="explainer-number">02</span><div><strong>name</strong><p>متغير يحتفظ بالاسم.</p></div></div><div class="explainer-item"><span class="explainer-number">03</span><div><strong>print()</strong><p>تعرض الرسالة على الشاشة.</p></div></div><div class="run-prompt"><span>▶</span> جرّب تشغيل الكود الآن</div></div></div>
+      </section>
+
+      <section class="slide" data-title="جرّب بنفسك" data-time="01:16–01:23" data-notes="دع الطالبة تعدّل النص أو تضيف سؤالاً جديداً. اترك لها وقتاً للتجربة حتى لو أخطأت؛ اسألها ماذا توقعت أن يحدث وماذا حدث فعلاً. اشرح أن رسائل الخطأ معلومات تساعدنا وليست دليلاً على الفشل. إذا انتهت مبكراً، اجعلها تطبع رسالة ثانية أو تستقبل مدينة السكن." aria-label="الشريحة 14">
+        <div class="section-kicker">13 / دورك الآن</div><h2>عدّل، شغّل، <span class="text-gradient">واكتشف</span></h2><p class="section-subtitle">المطلوب ليس أن تحفظ الكود؛ المطلوب أن تتجرأ على تغييره وفهم نتيجته.</p>
+        <div class="challenge-layout"><div class="challenge-checklist"><div class="challenge-heading"><span class="challenge-icon">✦</span><div><h3>تحديات صغيرة</h3><p>نفّذها بالترتيب، وجرّب النتيجة بعد كل تغيير.</p></div></div><label class="challenge-item"><input type="checkbox"><span class="custom-check"></span><span><strong>01 — غيّر رسالة الترحيب</strong><small>اكتب جملة من اختيارك.</small></span></label><label class="challenge-item"><input type="checkbox"><span class="custom-check"></span><span><strong>02 — أضف سؤالاً جديداً</strong><small>مثلاً: ما اللون المفضّل لديك؟</small></span></label><label class="challenge-item"><input type="checkbox"><span class="custom-check"></span><span><strong>03 — اطبع الإجابتين</strong><small>خزّن كل إجابة في متغير مختلف.</small></span></label><label class="challenge-item"><input type="checkbox"><span class="custom-check"></span><span><strong>04 — اصنع مفاجأة</strong><small>استخدم اسمك ضمن جملة خاصة.</small></span></label><div class="challenge-progress"><div class="challenge-progress-track"><span id="challengeProgress"></span></div><small><b id="challengeCount">0</b> من 4 مكتملة</small></div></div><div class="challenge-side"><div class="side-orb">?</div><h3>إذا ظهر خطأ…</h3><p>اقرأ الرسالة بهدوء، وحدّد السطر، وافحص الأقواس وعلامات التنصيص واسم المتغير.</p><div class="debug-tip"><strong>قاعدة ذهبية</strong><span>التجربة جزء من البرمجة، والخطأ جزء من التعلّم.</span></div></div></div>
+      </section>
+
+      <section class="slide" data-title="كيف نقرأ الخطأ؟" data-time="01:23–01:25" data-notes="اعرض أخطاء شائعة: نسيان قوس، خطأ في كتابة اسم المتغير، نسيان علامة التنصيص. قل للطالبة إن رسائل الخطأ غالباً تشير إلى نوع المشكلة والسطر الذي حدثت فيه. لا تطلب منها حفظ أسماء الأخطاء الآن." aria-label="الشريحة 15">
+        <div class="section-kicker">14 / لا تخف من الخطأ</div><h2>الخطأ ليس نهاية الكود… بل <span class="text-gradient">دليل</span></h2>
+        <div class="debug-layout"><div class="terminal-window"><div class="terminal-head"><div class="window-dots"><i></i><i></i><i></i></div><span>Terminal · example</span></div><div class="terminal-body"><p><span class="terminal-prompt">&gt;&gt;&gt;</span> print("Hello"</p><p class="terminal-error">SyntaxError: '(' was never closed</p><p class="terminal-prompt">↳ </p><p class="terminal-muted">السطر يخبرنا أن قوساً لم يُغلق.</p><div class="terminal-cursor"></div></div></div><div class="debug-rules"><div class="debug-rule"><span class="rule-number">01</span><div><strong>اقرأ الرسالة</strong><small>قد تخبرك بنوع الخطأ.</small></div></div><div class="debug-rule"><span class="rule-number">02</span><div><strong>راجع السطر</strong><small>افحص الأقواس والاقتباسات.</small></div></div><div class="debug-rule"><span class="rule-number">03</span><div><strong>اختبر بعد التعديل</strong><small>غيّر شيئاً واحداً كل مرة.</small></div></div></div></div><div class="debug-bottom"><span class="green-dot"></span> المبرمج لا يتجنّب الأخطاء دائماً؛ يتعلّم كيف يفهمها ويصلحها.</div>
+      </section>
+
+      <section class="slide" data-title="ماذا تعلّمنا؟" data-time="01:25–01:28" data-notes="اطلب من الطالبة أن تشرح لك البرمجة بجملة واحدة، وتذكر الفرق بين الخوارزمية والكود، ثم تشرح ما فعلته input وprint. إذا وجدت نقطة غير واضحة، راجعها بمثال واحد. اجعل التقييم حوارياً لا اختباراً رسمياً." aria-label="الشريحة 16">
+        <div class="section-kicker">15 / تثبيت المفاهيم</div><h2>قبل أن ننهي… <span class="text-gradient">ماذا تعلّمنا؟</span></h2>
+        <div class="recap-layout"><div class="recap-items"><div class="recap-item"><span>✓</span><p>البرمجة هي إعطاء الحاسوب تعليمات واضحة.</p></div><div class="recap-item"><span>✓</span><p>الخوارزمية ترتّب خطوات الحل قبل كتابة الكود.</p></div><div class="recap-item"><span>✓</span><p>توجد مسارات متعددة؛ والهدف المستقبلي هنا هو Front-End.</p></div><div class="recap-item"><span>✓</span><p>المحرر والمفسّر والمتصفح أدوات مختلفة لها أدوار محددة.</p></div><div class="recap-item"><span>✓</span><p>كتبنا برنامجاً يستقبل اسماً ويعرض رسالة.</p></div></div><div class="recap-question"><span class="question-label">سؤال الخروج</span><h3>لو أردتِ أن يطلب البرنامج عمركِ ثم يطبع رسالة، ما أول خطوة ستغيّرينها؟</h3><p>فكّري في المدخلات، ثم المعالجة، ثم المخرجات.</p><div class="recap-mark">Q<span>?</span></div></div></div>
+      </section>
+
+      <section class="slide" data-title="الواجب والخطوة التالية" data-time="01:28–01:30" data-notes="أنهِ الدرس بمهمة صغيرة قابلة للإنجاز. المطلوب تشغيل برنامج، وليس عمل مشروع كامل. اطلب منها الاحتفاظ بالكود أو لقطة شاشة للنتيجة. في الدرس القادم يمكن البدء بالمتغيرات وأنواع البيانات ثم العمليات الحسابية والمقارنات، مع العودة لاحقاً إلى HTML وCSS وJavaScript." aria-label="الشريحة 17">
+        <div class="section-kicker">16 / مهمتك بعد الجلسة</div><h2>واجب بسيط… <span class="text-gradient">خطوة حقيقية</span></h2>
+        <div class="homework-card"><div class="homework-side"><div class="homework-mark">01<span>.</span></div><span class="homework-mini-label">YOUR FIRST MINI PROGRAM</span><h3>برنامج تعارف صغير</h3><p>اكتب برنامجاً يستقبل اسمك ومدينتك، ثم يطبع رسالة ترحيبية تجمع المعلومتين.</p><a href="https://www.online-python.com/" target="_blank" rel="noopener">افتح محرر Python ↗</a></div><div class="homework-tasks"><h4>قائمة التحقق</h4><label><input type="checkbox"><span></span> استخدمت input لاستقبال الاسم.</label><label><input type="checkbox"><span></span> خزّنت المدينة في متغير آخر.</label><label><input type="checkbox"><span></span> استخدمت print لعرض الرسالة.</label><label><input type="checkbox"><span></span> شغّلت البرنامج وصوّرت النتيجة.</label><div class="next-lesson"><span>الخطوة القادمة</span><strong>المتغيرات · أنواع البيانات · العمليات</strong></div></div></div>
+        <div class="closing-line"><span class="brand-mark">&lt;/&gt;</span><strong>كل برنامج كبير بدأ بسطر صغير.</strong><span class="closing-glow"></span></div>
+      </section>
+
+      <section class="slide final-slide" data-title="روابط مفيدة" data-time="مرجع بعد الجلسة" data-notes="هذه الشريحة مرجع سريع يمكن الرجوع إليه بعد انتهاء العرض. افتح الروابط عند الحاجة. يمكنك أيضاً الضغط على زر الروابط في أسفل الشريحة أو متابعة العرض مجدداً من البداية." aria-label="الشريحة 18">
+        <div class="section-kicker">17 / احتفظ بهذه الروابط</div><h2>أدوات وروابط <span class="text-gradient">تستحق الحفظ</span></h2><p class="section-subtitle">مصادر رسمية للبدء والتدريب — اضغط على أي بطاقة لفتحها.</p>
+        <div class="resource-grid"><a href="https://www.python.org/" target="_blank" rel="noopener"><img src="https://cdn.simpleicons.org/python/3776AB" alt=""><span><strong>Python</strong><small>الموقع الرسمي</small></span><b>↗</b></a><a href="https://code.visualstudio.com/" target="_blank" rel="noopener"><img src="https://cdn.simpleicons.org/visualstudiocode/007ACC" alt=""><span><strong>VS Code</strong><small>محرر الكود</small></span><b>↗</b></a><a href="https://www.online-python.com/" target="_blank" rel="noopener"><span class="resource-symbol">▶</span><span><strong>Online Python</strong><small>تشغيل سريع من المتصفح</small></span><b>↗</b></a><a href="https://codeforces.com/" target="_blank" rel="noopener"><img src="https://cdn.simpleicons.org/codeforces/1F8ACB" alt=""><span><strong>Codeforces</strong><small>مسائل ومسابقات</small></span><b>↗</b></a><a href="https://atcoder.jp/" target="_blank" rel="noopener"><span class="resource-symbol atcoder-symbol">A</span><span><strong>AtCoder</strong><small>تحديات منظمة</small></span><b>↗</b></a><a href="https://leetcode.com/" target="_blank" rel="noopener"><img src="https://cdn.simpleicons.org/leetcode/FFA116" alt=""><span><strong>LeetCode</strong><small>تدريب على حل المشكلات</small></span><b>↗</b></a></div>
+        <div class="final-footer"><div><span class="brand-mark">&lt;/&gt;</span><span>عبد الرحمن العظم</span></div><strong>شكراً لمشاركتك في بداية الرحلة.</strong><button id="restartBtn">العودة للبداية ↺</button></div>
+      </section>
+
+      <div class="notes-panel" id="notesPanel" aria-live="polite"><span class="notes-label">ملاحظات المحاضر</span><p id="notesText"></p></div>
+      <div class="deck-controls"><div class="control-left"><button class="control-btn" id="prevBtn" aria-label="الشريحة السابقة" title="السابق ←">←</button><button class="control-btn" id="nextBtn" aria-label="الشريحة التالية" title="التالي →">→</button><span class="control-count"><b id="currentNumber">01</b><span>/</span><span id="totalNumber">18</span></span></div><div class="control-right"><span class="keyboard-help">استخدم ← → للتنقّل</span><button class="control-btn text-control" id="notesBtn" title="ملاحظات المحاضر (N)">ملاحظات <span>▤</span></button><button class="control-btn text-control" id="fullscreenBtn" title="ملء الشاشة (F)">ملء الشاشة <span>⛶</span></button></div></div>
+    </div>
+  </main>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <!-- <script src="script.js"></script> -->
+
+  <script>
+    (() => {
+  const deck = document.getElementById('deck');
+  const slides = Array.from(document.querySelectorAll('.slide'));
+  const prevBtn = document.getElementById('prevBtn');
+  const nextBtn = document.getElementById('nextBtn');
+  const notesBtn = document.getElementById('notesBtn');
+  const fullscreenBtn = document.getElementById('fullscreenBtn');
+  const restartBtn = document.getElementById('restartBtn');
+  const currentNumber = document.getElementById('currentNumber');
+  const totalNumber = document.getElementById('totalNumber');
+  const progressFill = document.getElementById('progressFill');
+  const notesText = document.getElementById('notesText');
+  const toast = document.getElementById('toast');
+  let activeIndex = 0;
+  let toastTimer = null;
+  totalNumber.textContent = String(slides.length).padStart(2, '0');
+
+  function showToast(message) {
+    toast.textContent = message;
+    toast.classList.add('show');
+    window.clearTimeout(toastTimer);
+    toastTimer = window.setTimeout(() => toast.classList.remove('show'), 1900);
+  }
+
+  function goTo(index) {
+    const bounded = Math.max(0, Math.min(slides.length - 1, index));
+    slides[activeIndex].classList.remove('active');
+    activeIndex = bounded;
+    slides[activeIndex].classList.add('active');
+    slides.forEach((slide, i) => slide.setAttribute('aria-hidden', i === activeIndex ? 'false' : 'true'));
+    currentNumber.textContent = String(activeIndex + 1).padStart(2, '0');
+    progressFill.style.width = `${((activeIndex + 1) / slides.length) * 100}%`;
+    prevBtn.disabled = activeIndex === 0;
+    nextBtn.disabled = activeIndex === slides.length - 1;
+    notesText.textContent = slides[activeIndex].dataset.notes || 'لا توجد ملاحظات لهذه الشريحة.';
+    document.title = `${slides[activeIndex].dataset.title || 'الدرس'} — ${activeIndex + 1}/${slides.length} | عبد الرحمن العظم`;
+    const activeSlide = slides[activeIndex];
+    activeSlide.scrollTop = 0;
+  }
+
+  function toggleNotes() {
+    const visible = deck.classList.toggle('notes-visible');
+    notesBtn.setAttribute('aria-pressed', String(visible));
+    notesBtn.innerHTML = visible ? 'إخفاء الملاحظات <span>▤</span>' : 'ملاحظات <span>▤</span>';
+  }
+
+  async function toggleFullscreen() {
+    try {
+      if (!document.fullscreenElement) {
+        await deck.requestFullscreen();
+        showToast('تم تفعيل ملء الشاشة · اضغط Esc للخروج');
+      } else {
+        await document.exitFullscreen();
+      }
+    } catch (error) {
+      showToast('قد لا يدعم المتصفح ملء الشاشة من هذه الصفحة.');
+    }
+  }
+
+  prevBtn.addEventListener('click', () => goTo(activeIndex - 1));
+  nextBtn.addEventListener('click', () => goTo(activeIndex + 1));
+  notesBtn.addEventListener('click', toggleNotes);
+  fullscreenBtn.addEventListener('click', toggleFullscreen);
+  restartBtn?.addEventListener('click', () => goTo(0));
+
+  document.addEventListener('keydown', event => {
+    const target = event.target;
+    const isTyping = target && (['INPUT', 'TEXTAREA', 'SELECT'].includes(target.tagName) || target.isContentEditable);
+    if (isTyping) return;
+    if (['ArrowRight', 'ArrowDown', 'PageDown', ' '].includes(event.key)) {
+      event.preventDefault();
+      goTo(activeIndex + 1);
+    } else if (['ArrowLeft', 'ArrowUp', 'PageUp'].includes(event.key)) {
+      event.preventDefault();
+      goTo(activeIndex - 1);
+    } else if (event.key === 'Home') {
+      event.preventDefault(); goTo(0);
+    } else if (event.key === 'End') {
+      event.preventDefault(); goTo(slides.length - 1);
+    } else if (event.key.toLowerCase() === 'n') {
+      toggleNotes();
+    } else if (event.key.toLowerCase() === 'f') {
+      toggleFullscreen();
+    } else if (event.key === 'Escape' && deck.classList.contains('notes-visible')) {
+      deck.classList.remove('notes-visible');
+      notesBtn.setAttribute('aria-pressed', 'false');
+      notesBtn.innerHTML = 'ملاحظات <span>▤</span>';
+    }
+  });
+
+  document.querySelectorAll('[data-copy]').forEach(button => {
+    button.addEventListener('click', async () => {
+      const text = button.dataset.copy;
+      try {
+        await navigator.clipboard.writeText(text);
+        showToast('تم نسخ الكود بنجاح');
+      } catch {
+        const temp = document.createElement('textarea');
+        temp.value = text;
+        document.body.appendChild(temp);
+        temp.select();
+        try { document.execCommand('copy'); showToast('تم نسخ الكود'); }
+        catch { showToast('تعذّر النسخ تلقائياً؛ حدّد الكود وانسخه يدوياً.'); }
+        temp.remove();
+      }
+    });
+  });
+
+  const challengeInputs = Array.from(document.querySelectorAll('.challenge-item input'));
+  const challengeProgress = document.getElementById('challengeProgress');
+  const challengeCount = document.getElementById('challengeCount');
+  function updateChallengeProgress() {
+    const checked = challengeInputs.filter(input => input.checked).length;
+    if (challengeProgress) challengeProgress.style.width = `${checked / Math.max(1, challengeInputs.length) * 100}%`;
+    if (challengeCount) challengeCount.textContent = String(checked);
+  }
+  challengeInputs.forEach(input => input.addEventListener('change', updateChallengeProgress));
+  updateChallengeProgress();
+
+  // Touch swipe support for mobile presentation.
+  let touchStartX = null;
+  deck.addEventListener('touchstart', event => {
+    touchStartX = event.changedTouches[0].clientX;
+  }, { passive: true });
+  deck.addEventListener('touchend', event => {
+    if (touchStartX === null) return;
+    const dx = event.changedTouches[0].clientX - touchStartX;
+    if (Math.abs(dx) > 70) {
+      // RTL deck: swipe left moves forward, swipe right moves backward.
+      goTo(activeIndex + (dx < 0 ? 1 : -1));
+    }
+    touchStartX = null;
+  }, { passive: true });
+
+  // Open every slide in a predictable initial state for assistive technology.
+  goTo(0);
+})();
+
+  </script>
+</body>
+</html>
